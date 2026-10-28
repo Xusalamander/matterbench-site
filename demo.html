@@ -1,0 +1,192 @@
+<!doctype html>
+<html lang="zh-CN" data-theme="dark">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>拼豆灯罩 · MatterBench 在线体验</title>
+  <meta name="description" content="在浏览器里设计一个会发光的拼豆灯罩:画四面图案,选 ESP32 + LED 面板的灯效,开灯看效果,再下载图纸和 ESP32 代码。">
+  <link rel="icon" href="assets/logo.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="assets/demo.css">
+  <script>
+    try { const t = localStorage.getItem("mb.demo.theme"); if (t) document.documentElement.dataset.theme = t; } catch (e) {}
+  </script>
+  <script type="importmap">
+    { "imports": {
+      "three": "https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js",
+      "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/"
+    } }
+  </script>
+  <script src="assets/demo.js" defer></script>
+  <script type="module" src="assets/viewer3d.js"></script>
+</head>
+<body>
+  <header class="bar">
+    <a class="logo" href="index.html" title="回到介绍页">
+      <img src="assets/logo.svg" alt="">
+      <b>MatterBench</b>
+      <span class="ver">在线体验 · 拼豆灯罩</span>
+    </a>
+    <div class="bar-mid">
+      <button class="icon" id="undo" title="撤销 (Ctrl+Z)" aria-label="撤销"><svg viewBox="0 0 24 24"><path d="M9 14 4 9l5-5"/><path d="M4 9h10a6 6 0 0 1 0 12h-3"/></svg></button>
+      <button class="icon" id="redo" title="重做 (Ctrl+Shift+Z)" aria-label="重做"><svg viewBox="0 0 24 24"><path d="m15 14 5-5-5-5"/><path d="M20 9H10a6 6 0 0 0 0 12h3"/></svg></button>
+      <button class="icon" id="clear" title="清空" aria-label="清空"><svg viewBox="0 0 24 24"><path d="M3 12a9 9 0 1 0 3-6.7L3 8"/><path d="M3 3v5h5"/></svg></button>
+    </div>
+    <div class="bar-right">
+      <button class="txt" id="themeBtn">浅色</button>
+      <button class="icon" id="helpBtn" title="怎么玩" aria-label="怎么玩"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M9.5 9a2.5 2.5 0 1 1 3.5 2.3c-.6.3-1 .9-1 1.6V14"/><path d="M12 17.5h.01"/></svg></button>
+      <a class="txt hide-sm" href="index.html">了解 MatterBench</a>
+      <a class="txt txt-go" href="index.html#join" data-go-join>我感兴趣</a>
+    </div>
+  </header>
+
+  <div class="app" id="app">
+    <main class="view" id="view">
+      <div class="view-tabs" role="tablist" aria-label="视图">
+        <button role="tab" data-view="2d" aria-selected="true">展开图</button>
+        <button role="tab" data-view="3d" aria-selected="false">3D 灯罩</button>
+      </div>
+      <button class="lamp-switch" id="lampSwitch" aria-pressed="false" title="开灯 / 关灯 (L)">
+        <svg viewBox="0 0 24 24"><path d="M9 18h6M10 21h4"/><path d="M12 3a6 6 0 0 0-4 10.5c.7.7 1 1.5 1 2.5h6c0-1 .3-1.8 1-2.5A6 6 0 0 0 12 3z"/></svg>
+        <span>开灯</span>
+      </button>
+      <div class="stage2d" id="stage2d"><canvas id="board" aria-label="灯罩展开图"></canvas></div>
+      <div class="stage3d" id="stage3d" hidden></div>
+      <div class="view-msg" id="viewMsg" hidden></div>
+      <button class="collapse" id="collapse" title="收起 / 展开侧栏" aria-label="收起或展开侧栏"><svg viewBox="0 0 24 24"><path d="m9 6 6 6-6 6"/></svg></button>
+    </main>
+
+    <aside class="side" id="side">
+      <div class="side-top">
+        <button class="btn-main" id="importImage">
+          <svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="16" rx="2"/><circle cx="9" cy="10" r="2"/><path d="m21 16-5-5-9 9"/></svg>
+          用一张图片铺满四面…
+        </button>
+        <input type="file" id="imageInput" accept="image/*" hidden>
+        <p class="fine">全部在你的浏览器里运行,不上传任何数据。</p>
+      </div>
+
+      <!-- ---------- 图案 ---------- -->
+      <section class="grp">
+        <h4>① 灯罩图案 <span class="tip" title="灯罩有四面,每面 16 × 16 颗拼豆。左边是四面摊开的样子,直接在上面画。">i</span></h4>
+        <div class="tpl-row" id="templates">
+          <button class="tpl" data-tpl="stars"><i style="background:linear-gradient(135deg,#1B2A4A,#2C3E6B)"></i>星空</button>
+          <button class="tpl" data-tpl="stripes"><i style="background:linear-gradient(90deg,#E5484D,#F5D547,#3DB86B,#3E63DD,#8E4EC6)"></i>彩条</button>
+          <button class="tpl" data-tpl="hearts"><i style="background:radial-gradient(circle,#E5484D 35%,#F6E7DA 36%)"></i>爱心</button>
+          <button class="tpl" data-tpl="window"><i style="background:linear-gradient(#F5D547 0 0) 50% 50%/40% 50% no-repeat,#5B3A29"></i>小屋</button>
+        </div>
+        <div class="swatches" id="palette"></div>
+        <div class="row">
+          <input type="color" id="customColor" value="#7A4FD6" aria-label="自定义颜色">
+          <button class="btn-sub grow" id="addColor">＋ 加入这个颜色</button>
+        </div>
+        <div class="seg seg-full" id="tools">
+          <button data-tool="pen" aria-pressed="true">画笔</button>
+          <button data-tool="fill" aria-pressed="false">填充</button>
+          <button data-tool="erase" aria-pressed="false">留空</button>
+          <button data-tool="pick" aria-pressed="false">吸色</button>
+        </div>
+        <button class="btn-sub" id="copyFace">把<b id="activeFaceName">前面</b>复制到四面</button>
+        <div class="slider">
+          <label for="colorCount">图片最多颜色</label>
+          <input type="range" id="colorCount" min="2" max="10" value="5">
+          <output id="colorCountLabel">5</output>
+        </div>
+      </section>
+
+      <!-- ---------- 灯光 ---------- -->
+      <section class="grp">
+        <h4>② 灯光 · ESP32 + LED 面板 <span class="tip" title="灯罩里面是 4 块 8×8 的 RGB 灯板,接在一块 ESP32 上。这里选的灯效,就是下载的代码会跑的效果。">i</span></h4>
+        <div class="chips-s" id="effects">
+          <button data-fx="solid" aria-pressed="true">常亮</button>
+          <button data-fx="breathe" aria-pressed="false">呼吸</button>
+          <button data-fx="rainbow" aria-pressed="false">彩虹环绕</button>
+          <button data-fx="rise" aria-pressed="false">流光上升</button>
+          <button data-fx="twinkle" aria-pressed="false">星光闪烁</button>
+        </div>
+        <div class="row" id="lightColorRow">
+          <input type="color" id="lightColor" value="#FFB65C" aria-label="灯光颜色">
+          <div class="chips-s grow" id="lightPresets">
+            <button data-c="#FFB65C">暖光</button>
+            <button data-c="#FFFFFF">白光</button>
+            <button data-c="#7FD4FF">冷蓝</button>
+            <button data-c="#FF5FA2">粉紫</button>
+          </div>
+        </div>
+        <div class="slider">
+          <label for="brightness">亮度</label>
+          <input type="range" id="brightness" min="10" max="100" value="70">
+          <output id="brightnessLabel">70%</output>
+        </div>
+        <div class="slider" id="speedRow">
+          <label for="speed">速度</label>
+          <input type="range" id="speed" min="1" max="10" value="4">
+          <output id="speedLabel">4</output>
+        </div>
+      </section>
+
+      <!-- ---------- 清单 ---------- -->
+      <section class="grp">
+        <h4>③ 材料清单</h4>
+        <div class="stats stats-2">
+          <div><b id="sumParts">0</b><span>颗拼豆</span></div>
+          <div><b id="sumColors">0</b><span>种颜色</span></div>
+        </div>
+        <table class="bom"><thead><tr><th>拼豆颜色</th><th class="num">颗数</th></tr></thead><tbody id="bom"></tbody></table>
+        <table class="bom">
+          <thead><tr><th>电子件</th><th class="num">数量</th></tr></thead>
+          <tbody>
+            <tr><td>ESP32 开发板</td><td class="num">1</td></tr>
+            <tr><td>8×8 RGB 灯板(WS2812B)</td><td class="num">4</td></tr>
+            <tr><td>5V 3A 电源 + USB 线</td><td class="num">1</td></tr>
+            <tr><td>杜邦线 / 导线</td><td class="num">若干</td></tr>
+          </tbody>
+        </table>
+      </section>
+
+      <!-- ---------- 导出 ---------- -->
+      <section class="grp">
+        <h4>④ 带走</h4>
+        <div class="row2">
+          <button class="btn-sub" id="dlPng">下载图纸</button>
+          <button class="btn-sub" id="dlCode">下载 ESP32 代码</button>
+        </div>
+        <p class="fine" style="text-align:left">代码用 Arduino IDE + FastLED 库,灯板数据线接 GPIO 5。</p>
+      </section>
+
+      <section class="grp cta-box">
+        <b>想让 MatterBench 帮你做出来?</b>
+        <p>从图案到构件、组装和测试,正是我们在做的事。留个联系方式,原型体验开放时先通知你。</p>
+        <a class="btn-go" href="index.html#join" data-go-join>我感兴趣 →</a>
+      </section>
+
+      <nav class="side-foot">
+        <a href="index.html">MatterBench 介绍</a>
+        <button id="aboutBtn">怎么玩</button>
+      </nav>
+    </aside>
+  </div>
+
+  <footer class="status">
+    <span id="statusInfo">—</span>
+    <label class="check"><input type="checkbox" id="optGrid" checked> 辅助线</label>
+    <span class="hint" id="statusHint"></span>
+  </footer>
+
+  <div class="modal-back" id="welcome" hidden>
+    <div class="modal" role="dialog" aria-modal="true" aria-labelledby="welcomeTitle">
+      <button class="icon modal-x" id="welcomeClose" aria-label="关闭"><svg viewBox="0 0 24 24"><path d="M6 6l12 12M18 6 6 18"/></svg></button>
+      <h2 id="welcomeTitle">做一个会发光的拼豆灯罩</h2>
+      <p>四面拼豆图案 + 里面一块 ESP32 和四块 RGB 灯板。在这里设计好,开灯看看效果,再把图纸和代码带走。</p>
+      <h5>怎么玩</h5>
+      <ol>
+        <li>挑一个 <b>模板</b>,或者在左边四面展开图上直接画;也可以 <b>用一张图片铺满四面</b>。</li>
+        <li>在 <b>② 灯光</b> 里选灯效、颜色和亮度,点左上角 <b>开灯</b>。</li>
+        <li>切到 <b>3D 灯罩</b>,拖动旋转,看光从拼豆里透出来。</li>
+        <li><b>下载图纸</b> 和 <b>ESP32 代码</b>,照着拼、烧录就能点亮。</li>
+      </ol>
+      <p class="fine">透光效果是示意;真实亮度和颜色取决于拼豆的材质和灯板。</p>
+      <button class="btn-go" id="welcomeGo">开始</button>
+    </div>
+  </div>
+</body>
+</html>
