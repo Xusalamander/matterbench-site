@@ -10,7 +10,7 @@
   <link rel="icon" href="assets/logo.svg" type="image/svg+xml">
   <link rel="stylesheet" href="assets/promo.css">
   <script src="config.js" defer></script>
-  <script src="assets/lead.js" defer></script>
+  <script src="assets/signup.js" defer></script>
 </head>
 <body>
   <header class="top">
@@ -228,24 +228,23 @@
           <p class="en">Meet us with an idea, project or everyday problem. We welcome learners and creators for prototype sessions, workshops and use-case development. Prior robotics experience is not required.</p>
         </div>
         <div class="partners">
-          <button type="button" class="partner" data-role="creator" aria-pressed="false">
+          <a class="partner" href="#join" data-cta="card-creator">
             <div class="ico" style="background:rgba(198,240,74,.35);color:#4D6410"><svg viewBox="0 0 24 24"><path d="M12 3l2.2 4.6 5 .7-3.6 3.5.9 5-4.5-2.4-4.5 2.4.9-5L4.8 8.3l5-.7z"/></svg></div>
             <div><h3>学员与创作者<small>Learners &amp; creators</small></h3><p>分享需求、体验原型、共同开发案例</p><p class="en">Share needs, test prototypes and develop use cases.</p></div>
-          </button>
-          <button type="button" class="partner" data-role="education" aria-pressed="false">
+          </a>
+          <a class="partner" href="#join" data-cta="card-education">
             <div class="ico" style="background:rgba(43,176,201,.16);color:#1F8FA6"><svg viewBox="0 0 24 24"><path d="M2 9l10-5 10 5-10 5z"/><path d="M6 11v5c3 2.5 9 2.5 12 0v-5"/><path d="M22 9v6"/></svg></div>
             <div><h3>高校与教育机构<small>Education partners</small></h3><p>课程共建、工作坊、场地与小规模试教</p><p class="en">Co-develop courses, host workshops and support pilots.</p></div>
-          </button>
-          <button type="button" class="partner" data-role="tech" aria-pressed="false">
+          </a>
+          <a class="partner" href="#join" data-cta="card-tech">
             <div class="ico" style="background:rgba(242,139,46,.16);color:#C2620F"><svg viewBox="0 0 24 24"><rect x="7" y="7" width="10" height="10" rx="2"/><path d="M10 2v5M14 2v5M10 17v5M14 17v5M2 10h5M2 14h5M17 10h5M17 14h5"/></svg></div>
             <div><h3>技术与供应链<small>Technical &amp; supply-chain partners</small></h3><p>软件、硬件、材料与制造方面的合作</p><p class="en">Software, hardware, materials and manufacturing.</p></div>
-          </button>
-          <button type="button" class="partner" data-role="industry" aria-pressed="false">
+          </a>
+          <a class="partner" href="#join" data-cta="card-industry">
             <div class="ico" style="background:rgba(22,24,29,.08);color:#16181D"><svg viewBox="0 0 24 24"><path d="M3 17l6-6 4 4 8-8"/><path d="M15 7h6v6"/></svg></div>
             <div><h3>投资人与行业伙伴<small>Investors &amp; industry</small></h3><p>创意工具、消费硬件与教育科技合作</p><p class="en">Creative tools, consumer hardware and education technology.</p></div>
-          </button>
+          </a>
         </div>
-        <p class="note-row no-print">点一张卡片,下面的表单会帮你选好身份。</p>
       </div>
     </section>
 
@@ -264,37 +263,13 @@
           <p class="print-only" style="font-size:7pt;color:#9CA1AA;margin:2mm 0 0">© OriginFab · MatterBench 仍在开发中,图片为概念示意。</p>
         </div>
 
-        <form class="form" id="leadForm" novalidate>
-          <div class="row2">
-            <div class="fld"><label for="f-name">怎么称呼你<small>Name</small></label><input type="text" id="f-name" name="name" maxlength="40" autocomplete="name" required></div>
-            <div class="fld"><label for="f-contact">邮箱或微信<small>Email / WeChat</small></label><input type="text" id="f-contact" name="contact" maxlength="80" autocomplete="email" required></div>
-          </div>
-          <fieldset class="fld">
-            <legend>你是<small>I am</small></legend>
-            <div class="chips">
-              <label class="chip"><input type="radio" name="role" value="creator"><span>学员 / 创作者</span></label>
-              <label class="chip"><input type="radio" name="role" value="education"><span>高校 / 教育机构</span></label>
-              <label class="chip"><input type="radio" name="role" value="tech"><span>技术 / 供应链</span></label>
-              <label class="chip"><input type="radio" name="role" value="industry"><span>投资 / 行业伙伴</span></label>
-              <label class="chip"><input type="radio" name="role" value="other"><span>其他</span></label>
-            </div>
-          </fieldset>
-          <fieldset class="fld">
-            <legend>想参与<small>Interested in · 可多选</small></legend>
-            <div class="chips">
-              <label class="chip"><input type="checkbox" name="interest" value="prototype"><span>原型体验</span></label>
-              <label class="chip"><input type="checkbox" name="interest" value="workshop"><span>课程 / 工作坊</span></label>
-              <label class="chip"><input type="checkbox" name="interest" value="cocreate"><span>案例共创</span></label>
-              <label class="chip"><input type="checkbox" name="interest" value="partner"><span>商务合作</span></label>
-              <label class="chip"><input type="checkbox" name="interest" value="updates"><span>先关注动态</span></label>
-            </div>
-          </fieldset>
-          <div class="fld"><label for="f-idea">你想做什么,或者遇到了什么问题?<small>选填 Optional</small></label><textarea id="f-idea" name="idea" maxlength="600" placeholder="比如:想给孩子做一个会动的小玩具 / 想在课上带学生做原型…"></textarea></div>
-          <div class="hp" aria-hidden="true"><label>Website <input type="text" name="website" tabindex="-1" autocomplete="off"></label></div>
-          <label class="agree"><input type="checkbox" name="agree" required> <span>同意 OriginFab 用以上信息联系我(只用于联系,不会分享给第三方)。<br>I agree to be contacted about MatterBench.</span></label>
-          <button type="submit" class="btn btn-dark">提交 / Submit</button>
-          <p class="form-msg" id="formMsg" role="status" aria-live="polite"></p>
-        </form>
+        <div class="signup">
+          <h3>填写报名表<small>Sign up</small></h3>
+          <p>大约 1 分钟:怎么称呼你、联系方式、你是谁、想参与什么。</p>
+          <p class="en">About a minute: your name, how to reach you, who you are and what you'd like to join.</p>
+          <a class="btn btn-lime" href="#join" data-signup target="_blank" rel="noopener">填写报名表 →</a>
+          <p class="signup-note" data-signup-note>报名表会在新页面打开。</p>
+        </div>
       </div>
     </section>
   </main>
