@@ -253,3 +253,76 @@ input[type="range"]{ width: 100%; accent-color: var(--accent); }
 .bom + .bom{ margin-top: 8px; }
 .row2 .btn-sub{ width: 100%; }
 @media (max-width: 820px) { .lamp-switch{ right: 12px; } }
+
+/* ---- 关卡:任务清单 ---- */
+.quest { background: var(--accent-soft); }
+.quest h4 { justify-content: space-between; }
+.quest-count { font: 700 12px var(--mono); color: var(--accent); letter-spacing: 0; }
+.quest-bar { height: 4px; border-radius: 4px; background: var(--raise-2); overflow: hidden; margin-bottom: 10px; }
+.quest-bar i { display: block; height: 100%; background: var(--accent); transition: width .3s; }
+.quest-list { list-style: none; margin: 0; padding: 0; display: grid; gap: 7px; }
+.quest-list li { display: flex; gap: 8px; align-items: center; color: var(--text); }
+.quest-list .tick { width: 16px; height: 16px; border-radius: 50%; border: 2px solid var(--text-2); flex: none; }
+.quest-list li.is-done { color: var(--text-2); text-decoration: line-through; }
+.quest-list li.is-done .tick { border-color: var(--accent); background: var(--accent) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Cpath d='M4 8.5l2.5 2.5L12 5.5' fill='none' stroke='%2316181D' stroke-width='2.2' stroke-linecap='round'/%3E%3C/svg%3E") center/12px no-repeat; }
+.quest-note { margin: 8px 0 0; font-size: 12px; color: var(--text-2); }
+
+/* ---- 过关提示 ---- */
+.pass { text-align: center; width: min(380px, 100%); }
+.pass-badge { width: 64px; height: 64px; margin: 4px auto 10px; border-radius: 50%; display: grid; place-items: center; font-size: 30px; background: #C6F04A; color: #16181D; box-shadow: 0 0 36px rgba(198, 240, 74, .45); }
+.pass h2 { font-size: 24px; }
+.pass-actions { display: grid; gap: 8px; margin-top: 16px; }
+.pass-actions a { display: grid; place-items: center; text-decoration: none; }
+.pass-actions .btn-sub { height: 38px; }
+
+/* ---- 精简:收起来的高级设置 ---- */
+details.more > summary { cursor: pointer; color: var(--text-2); font-size: 12px; font-weight: 600; list-style: none; }
+details.more > summary::before { content: "▸ "; }
+details.more[open] > summary::before { content: "▾ "; }
+details.more > *:not(summary) { margin-top: 10px; }
+.back-link { color: var(--text-2); text-decoration: none; font-weight: 600; font-size: 12px; }
+.back-link:hover { color: var(--text); }
+
+/* ---- 选关页 ---- */
+.hub { flex: 1; overflow: auto; padding: 40px 16px 64px; }
+.hub-in { width: min(1080px, 100%); margin: 0 auto; }
+.hub h1 { font-size: clamp(26px, 4vw, 40px); margin: 0 0 6px; }
+.hub .lead { color: var(--text-2); margin: 0 0 28px; font-size: 15px; }
+.levels { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }
+.levels > * { min-width: 0; }
+.level { display: grid; grid-template-rows: auto 1fr; background: var(--side); border: 1px solid var(--line); border-radius: 16px; overflow: hidden; text-decoration: none; color: inherit; transition: transform .15s, border-color .15s; }
+.level:hover { transform: translateY(-3px); border-color: var(--accent); }
+.level-pic { aspect-ratio: 16 / 10; background: #0F1013; position: relative; }
+.level-pic svg { width: 100%; height: 100%; }
+.level-done { position: absolute; top: 10px; right: 10px; background: #C6F04A; color: #16181D; font: 800 11px var(--font); padding: 4px 10px; border-radius: 999px; }
+.level-body { padding: 16px 18px 18px; display: grid; gap: 6px; align-content: start; }
+.stars { color: #FFB65C; letter-spacing: 2px; font-size: 13px; }
+.stars span { color: var(--raise-2); }
+.level-body b { font-size: 18px; }
+.level-body p { margin: 0; color: var(--text-2); font-size: 13px; }
+.level-go { margin-top: 8px; font-weight: 700; color: var(--accent); }
+@media (max-width: 860px) { .levels { grid-template-columns: 1fr; } .hub { padding-top: 24px; } }
+body.hub-page { overflow: auto; }
+
+/* ---- 第 3 关:豆条小人 ---- */
+.view-hint {
+  position: absolute; left: 50%; bottom: 14px; transform: translateX(-50%); z-index: 2;
+  background: var(--side); border: 1px solid var(--line); border-radius: 999px; padding: 6px 14px;
+  font-size: 12px; color: var(--text-2); white-space: nowrap; max-width: calc(100% - 24px); overflow: hidden; text-overflow: ellipsis;
+}
+#stage { cursor: grab; }
+#stage.dragging { cursor: grabbing; }
+.sel-empty { margin: 0; color: var(--text-2); }
+.sel-name { margin: 0 0 8px; }
+.sel-info { color: var(--text-2); font-size: 12px; }
+#selBox > * + * { margin-top: 10px; }
+.layer-row { display: grid; grid-template-columns: 1fr auto 1fr; gap: 8px; align-items: center; }
+.layer-tag { font: 700 12px var(--mono); padding: 4px 8px; border-radius: 6px; background: var(--raise); min-width: 56px; text-align: center; }
+.layer-list { display: grid; gap: 4px; }
+.layer-line { display: grid; grid-template-columns: 52px 1fr; gap: 8px; align-items: center; font-size: 12px; }
+.layer-line > span { font: 600 11px var(--mono); color: var(--text-2); }
+.layer-line .chips-s button { padding: 3px 8px; font-size: 11px; }
+.layer-line .chips-s button.bad { border-color: #E5484D; color: #FF8A8D; }
+.checks-s { list-style: none; margin: 10px 0 0; padding: 0; display: grid; gap: 6px; }
+.checks-s li { padding: 7px 9px 7px 10px; border-radius: 6px; background: var(--bg); border-left: 3px solid var(--accent); font-size: 12px; }
+.checks-s li.bad { border-left-color: #E5484D; }

@@ -59,6 +59,18 @@
   const light = Object.assign({ on: false, fx: "solid", color: "#FFB65C", bright: 70, speed: 4 }, saved?.light || {}, { on: false });
   const ui = { view: "2d", showGrid: true };
 
+  // ---- 本关任务 ----
+  const quest = MBQuest.init({
+    level: "lamp",
+    tasks: [
+      { id: "template", label: "挑一个灯罩模板" },
+      { id: "lightOn", label: "开灯看看效果" },
+      { id: "view3d", label: "切到 3D 灯罩转一圈" },
+      { id: "code", label: "下载 ESP32 代码" },
+    ],
+    next: { href: "puppet.html", label: "下一关:会动的豆条小人" },
+  });
+
   // ---- 撤销 / 重做(只管图案) ----
   const snap = () => JSON.stringify({ cells: work.cells, palette: work.palette });
   const hist = { undo: [], redo: [], prev: snap() };
@@ -159,6 +171,7 @@
     const msg = $("#viewMsg");
     msg.hidden = true;
     if (view === "3d") {
+      quest.done("view3d");
       if (window.MB3D) { window.MB3D.mount($("#stage3d")); push3d(); }
       else {
         msg.textContent = "3D 预览加载中…";
@@ -175,13 +188,16 @@
 
   function setTheme(t) {
     document.documentElement.dataset.theme = t;
-    $("#themeBtn").textContent = t === "dark" ? "浅色" : "深色";
+    if (themeBtn) themeBtn.textContent = t === "dark" ? "浅色" : "深色";
     try { localStorage.setItem("mb.demo.theme", t); } catch { /* 忽略 */ }
     push3d();
     refreshView();
   }
-  $("#themeBtn").addEventListener("click", () => setTheme(document.documentElement.dataset.theme === "dark" ? "light" : "dark"));
-  $("#themeBtn").textContent = document.documentElement.dataset.theme === "dark" ? "浅色" : "深色";
+  const themeBtn = $("#themeBtn"); // 精简后页面上没有这个按钮,主题沿用选关页的
+  if (themeBtn) {
+    themeBtn.addEventListener("click", () => setTheme(document.documentElement.dataset.theme === "dark" ? "light" : "dark"));
+    themeBtn.textContent = document.documentElement.dataset.theme === "dark" ? "浅色" : "深色";
+  }
 
   $("#collapse").addEventListener("click", () => { $("#app").classList.toggle("side-off"); requestAnimationFrame(refreshView); });
 
@@ -200,6 +216,7 @@
   let raf = 0, t0 = performance.now();
   function setLamp(on) {
     light.on = on;
+    if (on) quest.done("lightOn");
     const b = $("#lampSwitch");
     b.setAttribute("aria-pressed", String(on));
     b.querySelector("span").textContent = on ? "关灯" : "开灯";
@@ -493,6 +510,7 @@
     },
   };
   document.querySelectorAll("#templates [data-tpl]").forEach((b) => b.addEventListener("click", () => {
+    quest.done("template");
     const [cells, cols] = TEMPLATES[b.dataset.tpl]();
     work.cells = cells;
     cols.forEach((c) => { if (!work.palette.includes(c)) work.palette.push(c); });
@@ -719,6 +737,7 @@ void loop() {
   }
   $("#dlCode").addEventListener("click", () => {
     download("bead_lamp.ino", new Blob([buildSketch()], { type: "text/plain;charset=utf-8" }));
+    quest.done("code");
   });
   window.MB_buildSketch = buildSketch; // 方便调试
 

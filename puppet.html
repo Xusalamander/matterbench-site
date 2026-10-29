@@ -1,0 +1,107 @@
+<!doctype html>
+<html lang="zh-CN" data-theme="dark">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>第 3 关 · 会动的豆条小人 · MatterBench 在线体验</title>
+  <meta name="description" content="用豆条拼一个会动的小人:豆子上的孔就是关节,分层叠起来,拖动摆姿势,再让它动起来。">
+  <link rel="icon" href="assets/logo.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="assets/demo.css">
+  <script>
+    try { const t = localStorage.getItem("mb.demo.theme"); if (t) document.documentElement.dataset.theme = t; } catch (e) {}
+  </script>
+  <script src="assets/quest.js" defer></script>
+  <script src="assets/puppet.js" defer></script>
+</head>
+<body>
+  <header class="bar">
+    <a class="logo" href="demo.html" title="回到选关">
+      <img src="assets/logo.svg" alt="">
+      <b>MatterBench</b>
+      <span class="ver">第 3 关 · 会动的豆条小人</span>
+    </a>
+    <div class="bar-mid">
+      <button class="icon" id="undo" title="撤销 (Ctrl+Z)" aria-label="撤销"><svg viewBox="0 0 24 24"><path d="M9 14 4 9l5-5"/><path d="M4 9h10a6 6 0 0 1 0 12h-3"/></svg></button>
+    </div>
+    <div class="bar-right">
+      <a class="txt" href="demo.html">← 选关</a>
+      <a class="txt txt-go" href="index.html#join" data-go-join>我感兴趣</a>
+    </div>
+  </header>
+
+  <div class="app" id="app">
+    <main class="view" id="view">
+      <div class="view-tabs" role="tablist" aria-label="看法">
+        <button data-look="normal" aria-selected="true">正常看</button>
+        <button data-look="layers" aria-selected="false">分层看</button>
+      </div>
+      <div class="stage2d" id="stage2d"><canvas id="stage" aria-label="豆条小人"></canvas></div>
+      <div class="view-hint" id="viewHint">拖动四肢:绕孔转 · 拖动身体:整个移动 · 点一下:选中改颜色</div>
+    </main>
+
+    <aside class="side" id="side">
+      <section class="grp quest" id="quest"></section>
+
+      <section class="grp">
+        <h4>模板</h4>
+        <div class="chips-s" id="templates">
+          <button data-tpl="person" aria-pressed="true">小人</button>
+          <button data-tpl="dog" aria-pressed="false">小狗</button>
+          <button data-tpl="arm" aria-pressed="false">机械臂</button>
+        </div>
+      </section>
+
+      <section class="grp">
+        <h4>动起来</h4>
+        <div class="chips-s" id="anims"></div>
+        <button class="btn-sub" id="resetPose" style="margin-top:8px">摆回原样</button>
+      </section>
+
+      <section class="grp" id="editor">
+        <h4>选中的豆条 <span class="tip" title="点画面里的一根豆条来选中它。">i</span></h4>
+        <p class="sel-empty" id="selEmpty">点画面里的一根豆条。</p>
+        <div id="selBox" hidden>
+          <p class="sel-name"><b id="selName">—</b> <span id="selInfo" class="sel-info"></span></p>
+          <div class="swatches" id="selColors"></div>
+          <div class="row2" id="lenRow">
+            <button class="btn-sub" id="lenMinus">短一颗</button>
+            <button class="btn-sub" id="lenPlus">长一颗</button>
+          </div>
+          <div class="layer-row">
+            <button class="btn-sub" id="layerBack">往后一层</button>
+            <span class="layer-tag" id="selLayer">—</span>
+            <button class="btn-sub" id="layerFront">往前一层</button>
+          </div>
+        </div>
+      </section>
+
+      <section class="grp">
+        <h4>分层 <span class="tip" title="每个关节是一根销子,穿过两根豆条上的孔。连在同一个关节上的两根豆条必须在不同的层,不然销子穿不过去;同一层里的豆条也不能叠在一起。">i</span></h4>
+        <div class="layer-list" id="layerList"></div>
+        <ul class="checks-s" id="checks"></ul>
+      </section>
+
+      <section class="grp">
+        <h4>带走</h4>
+        <button class="btn-sub" id="dlPng">下载拼装图</button>
+      </section>
+
+      <section class="grp cta-box">
+        <b>想把它做成实物?</b>
+        <p>从图案到构件、组装和让它动起来,正是 MatterBench 在做的事。留个联系方式,原型体验开放时先通知你。</p>
+        <a class="btn-go" href="index.html#join" data-go-join>我感兴趣 →</a>
+      </section>
+
+      <nav class="side-foot">
+        <a href="demo.html">← 选关</a>
+        <a href="lamp.html">上一关:发光灯罩</a>
+      </nav>
+    </aside>
+  </div>
+
+  <footer class="status">
+    <span id="statusInfo">—</span>
+    <span class="hint">拖动四肢绕孔转 · Ctrl+Z 撤销</span>
+  </footer>
+</body>
+</html>
