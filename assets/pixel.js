@@ -61,7 +61,6 @@
       { id: "finish", label: "照着拼完一个图案" },
       { id: "save", label: "下载你的图案" },
     ],
-    next: { href: "lamp.html", label: "下一关:发光灯罩" },
   });
 
   // ---- 画板 ----

@@ -474,7 +474,6 @@
       { id: "pose", label: "拖动四肢,摆个姿势" },
       { id: "play", label: "让它动起来" },
     ],
-    next: null,
   });
 
   window.addEventListener("resize", () => { fit(); refresh(); });

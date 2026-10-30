@@ -3,14 +3,15 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>在线体验 · MatterBench</title>
-  <meta name="description" content="三个小关卡:拼豆像素画、发光拼豆灯罩、会动的豆条小人。全部在浏览器里运行,不用注册。">
+  <title>在线体验 · 领养你的拼豆伙伴 · MatterBench</title>
+  <meta name="description" content="抽一只随机的拼豆小伙伴,带它闯三关:拼出身体、学会发光、学会动。闯得越多,能领的小奖品越好。全部在浏览器里运行。">
   <link rel="icon" href="assets/logo.svg" type="image/svg+xml">
   <link rel="stylesheet" href="assets/demo.css">
-  <script>
-    try { const t = localStorage.getItem("mb.demo.theme"); if (t) document.documentElement.dataset.theme = t; } catch (e) {}
-  </script>
+  <script src="config.js"></script>
+  <script src="assets/signup.js" defer></script>
   <script src="assets/quest.js" defer></script>
+  <script src="assets/cardgen.js" defer></script>
+  <script src="assets/hub.js" defer></script>
 </head>
 <body class="hub-page">
   <header class="bar">
@@ -20,16 +21,59 @@
       <span class="ver">在线体验</span>
     </a>
     <div class="bar-right" style="margin-left:auto">
-      <a class="txt hide-sm" href="index.html">了解 MatterBench</a>
-      <a class="txt txt-go" href="index.html#join" data-go-join>我感兴趣</a>
+      <a class="txt" href="index.html">了解 MatterBench</a>
     </div>
   </header>
 
   <main class="hub">
     <div class="hub-in">
-      <h1>选一关开始</h1>
-      <p class="lead">从简单的开始,每关几分钟。全部在浏览器里运行,不用注册,不上传任何数据。</p>
+      <section class="lucky">
+        <div class="lucky-stage">
+          <div class="card-wrap" id="cardWrap">
+            <canvas id="card" width="360" height="504" aria-label="拼豆伙伴卡"></canvas>
+            <div class="burst" id="burst" aria-hidden="true"></div>
+          </div>
+        </div>
 
+        <div class="lucky-side">
+          <!-- 还没领养 -->
+          <div id="adopt">
+            <span class="step-tag">第 1 步</span>
+            <h1>领养你的拼豆伙伴</h1>
+            <p class="lead">抽一只随机的拼豆小伙伴,再带它闯三关:拼出身体、学会发光、学会动。闯得越多,能领的小奖品越好。</p>
+            <label class="nick">
+              <span>给它的主人起个名字,印在卡上(可不填)</span>
+              <input id="nick" maxlength="8" placeholder="比如:小豆" autocomplete="off">
+            </label>
+            <button class="btn-big" id="drawBtn">抽卡领养</button>
+            <details class="more odds-more">
+              <summary>四档稀有度和奖品</summary>
+              <ul class="odds" id="odds"></ul>
+            </details>
+          </div>
+
+          <!-- 已经领养 -->
+          <div id="mine" hidden>
+            <p class="tier-line"><span class="tier-tag" id="tierTag">N</span> <b id="tierName">普通</b> · 我的拼豆伙伴</p>
+            <h1 id="petName">—</h1>
+            <p class="dream" id="dream">—</p>
+            <div class="powers" id="powers"></div>
+            <div class="prize">
+              <span>现在能领的奖品</span>
+              <b id="prizeText">—</b>
+              <small id="prizeWhy"></small>
+            </div>
+            <a class="btn-big" id="nextBtn" href="pixel.html">—</a>
+            <a class="btn-claim" id="claimBtn" href="index.html#join" data-signup target="_blank" rel="noopener">领奖并报名 →</a>
+            <p class="fine-l">你的领奖码 <code id="codeText">—</code>:点「领奖并报名」会自动复制,在报名表的「伙伴卡号」一栏粘贴就行。<b id="claimMsg"></b></p>
+            <button class="btn-link" id="dlBtn">下载卡片,发给朋友</button>
+          </div>
+        </div>
+      </section>
+
+      <section class="train">
+        <h2>带它去训练</h2>
+        <p class="lead">每关几分钟,做完右边的小任务就算过关,伙伴会学会一个新技能。</p>
       <div class="levels">
         <a class="level" href="pixel.html" data-level="pixel">
           <div class="level-pic" aria-hidden="true">
@@ -41,6 +85,7 @@
           <div class="level-body">
             <div class="stars">★<span>★★</span></div>
             <b>第 1 关 · 拼豆像素画</b>
+            <span class="level-skill">解锁 🧩 拼出身体</span>
             <p>选颜色,在格子上点一点,拼出一个小图案。只有画、擦、撤销三个按钮。</p>
             <span class="level-go">开始 →</span>
           </div>
@@ -60,6 +105,7 @@
           <div class="level-body">
             <div class="stars">★★<span>★</span></div>
             <b>第 2 关 · 发光拼豆灯罩</b>
+            <span class="level-skill">解锁 💡 发光</span>
             <p>给灯罩四面拼图案,里面的 ESP32 灯板选个灯效,开灯看光透出来,还能带走代码。</p>
             <span class="level-go">开始 →</span>
           </div>
@@ -75,13 +121,22 @@
           <div class="level-body">
             <div class="stars">★★★</div>
             <b>第 3 关 · 会动的豆条小人</b>
+            <span class="level-skill">解锁 🦾 可动</span>
             <p>用豆条拼一个小人,豆子上的孔就是关节。拖动四肢摆姿势,再让它走起来。</p>
             <span class="level-go">开始 →</span>
           </div>
         </a>
       </div>
+
+      </section>
+
+      <details class="more rules">
+        <summary>活动说明</summary>
+        <ul id="rules"></ul>
+      </details>
     </div>
   </main>
+  <div class="toast" id="toast" role="status" aria-live="polite"></div>
 
   <script>
     // 缩略图:几颗豆子画出来,省得放图片
@@ -110,19 +165,6 @@
     for (let j = 0; j < 4; j++) for (let i = 0; i < 4; i++) if (!((i === 0 || i === 3) && (j === 0 || j === 3))) bead(hp, 136 + i * 13, 20 + j * 13, 6, "#F5D547");
     strip(155, 68, 90, 3, "#F28B2E");
     strip(155, 72, 200, 4, "#3DB86B"); strip(155, 72, -20, 4, "#3DB86B");
-    // 过关的打个勾(quest.js 是 defer 加载的,等它到了再读)
-    document.addEventListener("DOMContentLoaded", () => {
-      const done = (window.MBQuest && MBQuest.levels()) || {};
-      document.querySelectorAll("[data-level]").forEach((a) => {
-        if (!done[a.dataset.level]) return;
-        const tag = document.createElement("span");
-        tag.className = "level-done"; tag.textContent = "✓ 已过关";
-        a.querySelector(".level-pic").appendChild(tag);
-      });
-      document.querySelectorAll("[data-go-join]").forEach((a) => a.addEventListener("click", () => {
-        try { sessionStorage.setItem("mb.cta", JSON.stringify("demo-hub")); } catch (e) { /* 忽略 */ }
-      }));
-    });
   </script>
 </body>
 </html>

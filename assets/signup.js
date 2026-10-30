@@ -26,7 +26,10 @@
     u.searchParams.set("utm_source", "matterbench");
     u.searchParams.set("utm_medium", "website");
     u.searchParams.set("utm_campaign", ss.get("mb.from") || "direct");
-    u.searchParams.set("utm_content", lastCta || "join");
+    u.searchParams.set("utm_content", ss.get("mb.cta") || lastCta || "join");
+    // 抽卡页抽到卡后会留下卡号,一起带过去
+    // (card 参数给 Wix 页面上的脚本读,自动填进表单的「卡号」栏)
+    if (ss.get("mb.term")) { u.searchParams.set("utm_term", ss.get("mb.term")); u.searchParams.set("card", ss.get("mb.term")); }
     return u.toString();
   }
 

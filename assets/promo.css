@@ -241,3 +241,6 @@ a.partner:hover { border-color: var(--teal); }
 .signup .btn.is-disabled { background: #E3E3DE; color: var(--text-2); cursor: default; }
 .signup-note { font-size: 13px; color: var(--text-2); }
 @media print { .signup { display: none !important; } }
+.lucky-link { font-size: 14px; font-weight: 700; color: var(--accent, #1F8FA6); text-decoration: none; margin-top: 4px; }
+.lucky-link:hover { text-decoration: underline; }
+@media print { .lucky-link { display: none !important; } }

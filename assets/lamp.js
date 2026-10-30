@@ -68,7 +68,6 @@
       { id: "view3d", label: "切到 3D 灯罩转一圈" },
       { id: "code", label: "下载 ESP32 代码" },
     ],
-    next: { href: "puppet.html", label: "下一关:会动的豆条小人" },
   });
 
   // ---- 撤销 / 重做(只管图案) ----
@@ -254,16 +253,6 @@
   $("#lightColor").addEventListener("input", (e) => { light.color = e.target.value.toUpperCase(); lightChanged(); });
   $("#brightness").addEventListener("input", (e) => { light.bright = Number(e.target.value); lightChanged(); });
   $("#speed").addEventListener("input", (e) => { light.speed = Number(e.target.value); lightChanged(); });
-
-  // 去留联系方式:把「玩过灯罩、拼了多少、选了什么灯效」带给表单(同源 sessionStorage)
-  function recordDemo() {
-    const st = stats();
-    try { sessionStorage.setItem("mb.demo", JSON.stringify({ lamp: 1, parts: st.parts, colors: st.rows.length, fx: light.fx })); } catch { /* 忽略 */ }
-  }
-  document.querySelectorAll("[data-go-join]").forEach((a) => a.addEventListener("click", () => {
-    recordDemo();
-    try { sessionStorage.setItem("mb.cta", JSON.stringify("demo")); } catch { /* 忽略 */ }
-  }));
 
   // =====================================================================
   // 展开图:四面一排(窄屏 2×2),直接在上面画
@@ -599,7 +588,6 @@
     }
     $("#activeFaceName").textContent = FACE_NAMES[work.face];
     saveAll();
-    if (st.parts) recordDemo();
     updateStatus(st);
     syncHistoryButtons();
   }

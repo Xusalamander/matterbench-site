@@ -1,0 +1,47 @@
+<!doctype html>
+<html lang="zh-CN" data-theme="dark">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>查验伙伴卡 · MatterBench</title>
+  <meta name="robots" content="noindex">
+  <link rel="icon" href="assets/logo.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="assets/demo.css">
+  <script src="config.js"></script>
+  <script src="assets/cardgen.js" defer></script>
+  <script src="assets/check.js" defer></script>
+</head>
+<body class="hub-page">
+  <header class="bar">
+    <a class="logo" href="index.html" title="回到介绍页">
+      <img src="assets/logo.svg" alt="">
+      <b>MatterBench</b>
+      <span class="ver">查验伙伴卡</span>
+    </a>
+    <div class="bar-right" style="margin-left:auto">
+      <a class="txt txt-go" href="demo.html">领养我的伙伴</a>
+    </div>
+  </header>
+
+  <main class="hub">
+    <div class="hub-in">
+      <section class="lucky">
+        <div class="lucky-stage">
+          <div class="card-wrap"><canvas id="card" width="360" height="504" aria-label="拼豆伙伴卡"></canvas></div>
+        </div>
+        <div class="lucky-side">
+          <h1>查验伙伴卡</h1>
+          <p class="lead">贴上报名表里的「伙伴卡号」:领奖码(带闯关记录)或卡号都行。</p>
+          <form class="check-form" id="checkForm">
+            <input id="codeIn" placeholder="MB-XXXX-XXXX-XX" autocomplete="off" spellcheck="false">
+            <button class="btn-mini" type="submit">查验</button>
+          </form>
+          <p class="check-res" id="checkRes" hidden></p>
+          <dl class="check-dl" id="checkDl" hidden></dl>
+          <p class="fine-l">只按号码重新生成卡片,不保存任何东西。卡上印的主人名字不在号码里,这里不显示。卡片按拼好的样子画,照着就能拼实物。</p>
+        </div>
+      </section>
+    </div>
+  </main>
+</body>
+</html>
