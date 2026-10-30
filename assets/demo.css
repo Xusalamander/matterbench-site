@@ -16,6 +16,8 @@
   --bad: #E5484D;
   --board: #1D1F24;
   --dot: #34373F;
+  --swatch-ring: rgba(255, 255, 255, .32); /* 深色底上黑色色块也看得见 */
+  --reward: #C6F04A;
   --grid: rgba(255, 255, 255, .06);
   --font: "Inter", "Segoe UI", "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", system-ui, sans-serif;
   --mono: "JetBrains Mono", "SFMono-Regular", Consolas, Menlo, monospace;
@@ -35,6 +37,8 @@ html[data-theme="light"]{
   --accent-soft: rgba(31, 143, 166, .10);
   --board: #FFFFFF;
   --dot: #DADAD3;
+  --swatch-ring: rgba(0, 0, 0, .22);      /* 浅色底上白色色块也看得见 */
+  --reward: #4B7A0F;
   --grid: rgba(22, 24, 29, .07);
   color-scheme: light;
 }
@@ -146,7 +150,7 @@ input[type="color"]{ width: 40px; height: 32px; border: 1px solid var(--line); b
 .swatches{ display: grid; grid-template-columns: repeat(auto-fill, minmax(34px, 1fr)); gap: 6px; }
 .swatch{
   aspect-ratio: 1; border-radius: 6px; border: 0; padding: 0; position: relative;
-  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, .08), inset 0 0 0 1px rgba(0, 0, 0, .25);
+  box-shadow: inset 0 0 0 1.5px var(--swatch-ring);
 }
 .swatch::after{ /* 管段的孔 */
   content: ""; position: absolute; inset: 34%; border-radius: 50%; background: rgba(0, 0, 0, .18);
@@ -322,6 +326,14 @@ body.hub-page { overflow: auto; }
 .checks-s { list-style: none; margin: 10px 0 0; padding: 0; display: grid; gap: 6px; }
 .checks-s li { padding: 7px 9px 7px 10px; border-radius: 6px; background: var(--bg); border-left: 3px solid var(--accent); font-size: 12px; }
 .checks-s li.bad { border-left-color: #E5484D; }
+.check-go { display: block; margin-top: 6px; height: 26px; padding: 0 10px; border: 0; border-radius: 6px; background: #E5484D; color: #fff; font-size: 12px; font-weight: 600; }
+.sel-hint { margin: 8px 0 0; padding: 7px 9px; border-radius: 6px; background: rgba(229, 72, 77, .12); color: var(--text); font-size: 12px; }
+.layer-demo { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin: 8px 0; }
+.layer-demo figure { margin: 0; padding: 6px; border-radius: 6px; background: var(--bg); }
+.layer-demo svg { display: block; width: 100%; height: auto; stroke: none; }
+.layer-demo figcaption { font-size: 11px; color: var(--text-2); text-align: center; }
+.ld-a { fill: #E5484D; } .ld-b { fill: #1F8FA6; } .ld-x { opacity: .75; }
+.ld-pin { stroke: #8FBF1F; stroke-width: 4; stroke-linecap: round; } .ld-bad { stroke: #FF4D52; stroke-dasharray: 4 4; }
 
 /* ---- 抽卡页 ---- */
 .lucky { display: grid; grid-template-columns: minmax(0, 400px) minmax(0, 1fr); gap: 40px; align-items: start; width: min(960px, 100%); }
@@ -399,7 +411,7 @@ a.power:hover { border-color: var(--accent); }
 .level-skill { font-size: 12px; font-weight: 700; color: #C6F04A; }
 .toast { position: fixed; left: 50%; bottom: 24px; transform: translate(-50%, 20px); max-width: min(520px, calc(100% - 32px)); padding: 12px 18px; border-radius: 12px; background: #C6F04A; color: #16181D; font-weight: 700; font-size: 14px; box-shadow: 0 10px 30px rgba(0,0,0,.4); opacity: 0; pointer-events: none; transition: opacity .25s, transform .25s; z-index: 50; }
 .toast.show { opacity: 1; transform: translate(-50%, 0); }
-.quest-reward { margin: -4px 0 8px; font-size: 12px; color: #C6F04A; }
+.quest-reward { margin: -4px 0 8px; font-size: 12px; color: var(--reward); }
 /* 查验页 */
 .check-form { display: flex; gap: 8px; margin-bottom: 12px; }
 .check-form input { flex: 1; min-width: 0; height: 40px; padding: 0 12px; border-radius: 10px; border: 1px solid var(--line); background: var(--side); font: 600 14px var(--mono); }
@@ -407,3 +419,12 @@ a.power:hover { border-color: var(--accent); }
 .check-dl { display: grid; grid-template-columns: 48px minmax(0, 1fr); gap: 6px 12px; margin: 12px 0; font-size: 13px; }
 .check-dl dt { color: var(--text-2); }
 .check-dl dd { margin: 0; }
+.code-row { display: flex; align-items: center; gap: 8px; margin: 14px 0 4px; padding: 8px 8px 8px 12px; border: 1px dashed var(--line); border-radius: 8px; background: var(--raise); }
+.code-row > span { font-size: 12px; color: var(--text-2); flex: none; }
+.code-row code { flex: 1; min-width: 0; font: 700 15px var(--mono); letter-spacing: .02em; user-select: all; overflow-wrap: anywhere; }
+.btn-copy { flex: none; height: 32px; padding: 0 14px; border: 0; border-radius: 6px; background: var(--accent); color: #0F1013; font-weight: 700; }
+.btn-copy.is-ok { background: #3DB86B; color: #fff; }
+.btn-share { display: block; width: 100%; margin-top: 10px; height: 40px; border: 1px solid var(--line); border-radius: 8px; background: var(--raise); color: var(--text); font-weight: 600; }
+.btn-share:hover { background: var(--raise-2); }
+.check-files { display: flex; flex-wrap: wrap; gap: 8px; margin: 0 0 12px; }
+.check-files .btn-mini { height: 36px; padding: 0 14px; }

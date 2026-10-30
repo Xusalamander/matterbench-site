@@ -13,6 +13,11 @@
   };
   const hexToRgb = (h) => { const n = parseInt(h.slice(1), 16); return [n >> 16 & 255, n >> 8 & 255, n & 255]; };
   const isLight = (hex) => { const [r, g, b] = hexToRgb(hex); return (0.2126 * r + 0.7152 * g + 0.0722 * b) / 255 > 0.67; };
+  // 豆子描边:颜色和底色太接近(深色底上的黑豆、浅色底上的白豆、黄豆)时描一圈明显的边
+  const lum = (hex) => { const [r, g, b] = hexToRgb(hex); return (0.2126 * r + 0.7152 * g + 0.0722 * b) / 255; };
+  const rim = (c, bg) => (Math.abs(lum(c) - lum(bg)) < 0.22
+    ? (lum(bg) > 0.5 ? "rgba(0,0,0,.42)" : "rgba(255,255,255,.5)")
+    : isLight(c) ? "rgba(0,0,0,.2)" : "rgba(255,255,255,.18)");
   const PALETTE = ["#16181D", "#FFFFFF", "#F6E7DA", "#E5484D", "#F28B2E", "#F5D547", "#C6F04A", "#3DB86B", "#1F8FA6", "#3E63DD", "#8E4EC6", "#8B5A3C"];
 
   // ---- 零件形状 ----
@@ -170,7 +175,7 @@
       if (!p.parent) continue;
       const par = byId(p.parent);
       if (p.layer === par.layer) {
-        issues.push({ kind: "joint", text: `「${p.name}」和「${par.name}」在同一层(${layerName(p.layer)}),销子穿不过去 → 把「${p.name}」往前或往后挪一层` });
+        issues.push({ kind: "joint", id: p.id, text: `「${p.name}」和「${par.name}」在同一层(${layerName(p.layer)}),销子穿不过去 → 把「${p.name}」往前或往后挪一层` });
         bad.add(p.id); bad.add(par.id);
       }
     }
@@ -181,7 +186,7 @@
       let hit = false;
       for (const p of pts[i]) { for (const q of pts[j]) { if (Math.hypot(p[0] - q[0], p[1] - q[1]) < 0.9) { hit = true; break; } } if (hit) break; }
       if (hit) {
-        issues.push({ kind: "overlap", text: `「${a.name}」和「${b.name}」都在${layerName(a.layer)},叠在一起会撞 → 换一层` });
+        issues.push({ kind: "overlap", id: a.id, text: `「${a.name}」和「${b.name}」都在${layerName(a.layer)},叠在一起会撞 → 换一层` });
         bad.add(a.id); bad.add(b.id);
       }
     }
@@ -219,7 +224,7 @@
     for (let gx = view.cx % s; gx < view.w; gx += s) for (let gy = view.cy % s; gy < view.h; gy += s) { ctx.fillRect(gx - 0.75, gy - 0.75, 1.5, 1.5); }
 
     const order = pieces.map((p, i) => ({ p, i })).sort((a, b) => a.p.layer - b.p.layer || a.i - b.i);
-    const r = s * 0.46;
+    const r = s * 0.46, bg = css("--view");
     for (const { p } of order) {
       const f = frames[p.id], [ox, oy] = layerOffset(p.layer);
       const isBad = result.bad.has(p.id), isSel = selected === p.id;
@@ -233,7 +238,7 @@
         ctx.fillStyle = col;
         ctx.beginPath(); ctx.arc(sx, sy, r, 0, Math.PI * 2); ctx.fill();
         ctx.lineWidth = isBad || isSel ? Math.max(2, s * 0.09) : Math.max(1, s * 0.04);
-        ctx.strokeStyle = isBad ? "#FF4D52" : isSel ? "#C6F04A" : isLight(col) ? "rgba(0,0,0,.2)" : "rgba(255,255,255,.18)";
+        ctx.strokeStyle = isBad ? "#FF4D52" : isSel ? "#C6F04A" : rim(col, bg);
         ctx.stroke();
         ctx.fillStyle = isLight(col) ? "rgba(0,0,0,.2)" : "rgba(255,255,255,.22)";
         ctx.beginPath(); ctx.arc(sx, sy, s * 0.16, 0, Math.PI * 2); ctx.fill();
@@ -354,6 +359,9 @@
     $("#selName").textContent = p.name;
     $("#selInfo").textContent = `${p.kind === "strip" ? "豆条" : "豆片"} · ${cellsOf(p).length} 颗 · ${p.parent ? "绕孔转" : "拖它能整个移动"}`;
     $("#selLayer").textContent = layerName(p.layer);
+    const issue = lastResult.issues.find((it) => it.id === p.id || (it.kind === "joint" && byId(it.id).parent === p.id));
+    $("#selHint").hidden = !issue;
+    if (issue) $("#selHint").textContent = issue.text;
     $("#lenRow").hidden = p.kind !== "strip";
     $("#lenMinus").disabled = p.len <= 2; $("#lenPlus").disabled = p.len >= 8;
     const box = $("#selColors"); box.innerHTML = "";
@@ -384,7 +392,13 @@
     const ul = $("#checks"); ul.innerHTML = "";
     const items = lastResult.issues.length ? lastResult.issues : [{ kind: "ok", text: "层都排好了:每个关节的两件在不同层,同一层里没有叠在一起的。" }];
     for (const it of items.slice(0, 4)) {
-      const li = document.createElement("li"); li.className = it.kind === "ok" ? "" : "bad"; li.textContent = it.text; ul.appendChild(li);
+      const li = document.createElement("li"); li.className = it.kind === "ok" ? "" : "bad"; li.textContent = it.text;
+      if (it.id && it.id !== selected) {
+        const b = document.createElement("button"); b.className = "check-go"; b.textContent = "选中它";
+        b.addEventListener("click", () => { selected = it.id; setLook("layers"); refresh(); $("#editor").scrollIntoView({ block: "nearest", behavior: "smooth" }); });
+        li.appendChild(b);
+      }
+      ul.appendChild(li);
     }
   }
 
@@ -407,13 +421,15 @@
   document.addEventListener("keydown", (e) => { if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === "z") { e.preventDefault(); undo(); } });
   document.querySelectorAll("#templates [data-tpl]").forEach((b) => b.addEventListener("click", () => {
     if (b.dataset.tpl === tplId) return;
-    pushHistory(); loadTemplate(b.dataset.tpl); refresh();
+    pushHistory(); loadTemplate(b.dataset.tpl); refresh(); pickProblem();
   }));
-  document.querySelectorAll("[data-look]").forEach((b) => b.addEventListener("click", () => {
-    look = b.dataset.look;
-    document.querySelectorAll("[data-look]").forEach((x) => x.setAttribute("aria-selected", String(x === b)));
-    refresh();
-  }));
+  function setLook(v) {
+    look = v;
+    document.querySelectorAll("[data-look]").forEach((x) => x.setAttribute("aria-selected", String(x.dataset.look === v)));
+  }
+  document.querySelectorAll("[data-look]").forEach((b) => b.addEventListener("click", () => { setLook(b.dataset.look); refresh(); }));
+  // 一进来有标红的问题,就先替他选中那根豆条,右边直接出现「往后一层 / 往前一层」
+  function pickProblem() { const it = lastResult.issues[0]; if (it && !selected) { selected = it.id; refresh(); } }
 
   // ---- 带走:拼装图 ----
   $("#dlPng").addEventListener("click", () => {
@@ -469,7 +485,7 @@
   const quest = MBQuest.init({
     level: "puppet",
     tasks: [
-      { id: "fix", label: "修好标红的「同一层」问题" },
+      { id: "fix", label: "把标红的豆条换到另一层(选中它,点「往后一层」)" },
       { id: "color", label: "点一根豆条,换个颜色或长短" },
       { id: "pose", label: "拖动四肢,摆个姿势" },
       { id: "play", label: "让它动起来" },
@@ -480,4 +496,5 @@
   const saved = storage.get("mb.demo.puppet");
   loadTemplate(saved && TEMPLATES[saved.tpl] ? saved.tpl : "person", saved);
   refresh();
+  pickProblem();
 })();

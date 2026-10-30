@@ -11,6 +11,7 @@
   <script src="assets/signup.js" defer></script>
   <script src="assets/quest.js" defer></script>
   <script src="assets/cardgen.js" defer></script>
+  <script src="assets/vendor/qrcode.js" defer></script>
   <script src="assets/hub.js" defer></script>
 </head>
 <body class="hub-page">
@@ -65,8 +66,13 @@
             </div>
             <a class="btn-big" id="nextBtn" href="pixel.html">—</a>
             <a class="btn-claim" id="claimBtn" href="index.html#join" data-signup target="_blank" rel="noopener">领奖并报名 →</a>
-            <p class="fine-l">你的领奖码 <code id="codeText">—</code>:点「领奖并报名」会自动复制,在报名表的「伙伴卡号」一栏粘贴就行。<b id="claimMsg"></b></p>
-            <button class="btn-link" id="dlBtn">下载卡片,发给朋友</button>
+            <div class="code-row">
+              <span>领奖码</span>
+              <code id="codeText">—</code>
+              <button class="btn-copy" id="copyBtn" type="button">复制</button>
+            </div>
+            <p class="fine-l">报名表里有一栏「伙伴卡号」,把领奖码粘贴进去。点「领奖并报名」也会自动复制。</p>
+            <button class="btn-share" id="shareBtn" type="button">分享我的伙伴卡(带二维码)</button>
           </div>
         </div>
       </section>

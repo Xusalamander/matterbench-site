@@ -2,6 +2,7 @@
 (() => {
   "use strict";
   const N = 16;
+  const FREE_GOAL = 40; // 自由画:放满这么多颗就算拼完一个图案
   const $ = (s) => document.querySelector(s);
   const css = (name) => getComputedStyle(document.documentElement).getPropertyValue(name).trim();
   const storage = {
@@ -10,6 +11,11 @@
   };
   const hexToRgb = (h) => { const n = parseInt(h.slice(1), 16); return [n >> 16 & 255, n >> 8 & 255, n & 255]; };
   const isLight = (hex) => { const [r, g, b] = hexToRgb(hex); return (0.2126 * r + 0.7152 * g + 0.0722 * b) / 255 > 0.67; };
+  // 豆子描边:颜色和底色太接近(深色底上的黑豆、浅色底上的白豆、黄豆)时描一圈明显的边
+  const lum = (hex) => { const [r, g, b] = hexToRgb(hex); return (0.2126 * r + 0.7152 * g + 0.0722 * b) / 255; };
+  const rim = (c, bg) => (Math.abs(lum(c) - lum(bg)) < 0.22
+    ? (lum(bg) > 0.5 ? "rgba(0,0,0,.42)" : "rgba(255,255,255,.5)")
+    : isLight(c) ? "rgba(0,0,0,.18)" : "rgba(255,255,255,.18)");
 
   const C = { X: "#16181D", W: "#FFFFFF", F: "#F6E7DA", R: "#E5484D", Y: "#F5D547" };
   const PALETTE = ["#16181D", "#FFFFFF", "#F6E7DA", "#E5484D", "#F28B2E", "#F5D547", "#C6F04A", "#3DB86B", "#1F8FA6", "#3E63DD", "#8E4EC6", "#F2A7C3"];
@@ -58,7 +64,7 @@
     tasks: [
       { id: "first", label: "放下第一颗豆" },
       { id: "colors", label: "用上 3 种颜色" },
-      { id: "finish", label: "照着拼完一个图案" },
+      { id: "finish", label: `拼完一个图案(照着拼,或自由画满 ${FREE_GOAL} 颗)` },
       { id: "save", label: "下载你的图案" },
     ],
   });
@@ -74,7 +80,8 @@
   }
   function draw() {
     const W = board.width, cell = W / N;
-    ctx.fillStyle = css("--board"); ctx.fillRect(0, 0, W, W);
+    const bg = css("--board");
+    ctx.fillStyle = bg; ctx.fillRect(0, 0, W, W);
     for (let y = 0; y < N; y++) for (let x = 0; x < N; x++) {
       const i = y * N + x, c = st.cells[i], g = guide[i];
       const cx = x * cell + cell / 2, cy = y * cell + cell / 2;
@@ -83,6 +90,10 @@
           ctx.globalAlpha = 0.28; ctx.fillStyle = g;
           ctx.beginPath(); ctx.arc(cx, cy, cell * 0.42, 0, Math.PI * 2); ctx.fill();
           ctx.globalAlpha = 1;
+          if (Math.abs(lum(g) - lum(bg)) < 0.22) { // 和底色太像的(黑、白):补一圈虚线
+            ctx.strokeStyle = rim(g, bg); ctx.lineWidth = Math.max(1, cell * 0.04); ctx.setLineDash([cell * 0.12, cell * 0.1]);
+            ctx.beginPath(); ctx.arc(cx, cy, cell * 0.4, 0, Math.PI * 2); ctx.stroke(); ctx.setLineDash([]);
+          }
         }
         ctx.fillStyle = css("--dot");
         ctx.beginPath(); ctx.arc(cx, cy, Math.max(1.2, cell * 0.07), 0, Math.PI * 2); ctx.fill();
@@ -90,7 +101,7 @@
       }
       ctx.fillStyle = c;
       ctx.beginPath(); ctx.arc(cx, cy, cell * 0.46, 0, Math.PI * 2); ctx.fill();
-      ctx.strokeStyle = isLight(c) ? "rgba(0,0,0,.18)" : "rgba(255,255,255,.18)";
+      ctx.strokeStyle = rim(c, bg);
       ctx.lineWidth = Math.max(1, cell * 0.04); ctx.stroke();
       ctx.fillStyle = isLight(c) ? "rgba(0,0,0,.18)" : "rgba(255,255,255,.22)";
       ctx.beginPath(); ctx.arc(cx, cy, cell * 0.17, 0, Math.PI * 2); ctx.fill();
@@ -189,10 +200,10 @@
     const right = guide.reduce((n, g, i) => n + (g && st.cells[i] === g ? 1 : 0), 0);
     $("#statusInfo").textContent = target
       ? `照着拼:已对 ${right} / ${target} 颗` + (right >= target ? " · 完成!" : "")
-      : `自由画 · ${parts} 颗 · ${used.size} 种颜色`;
+      : `自由画 · ${parts} 颗 · ${used.size} 种颜色` + (parts >= FREE_GOAL ? " · 完成!" : ` · 再放 ${FREE_GOAL - parts} 颗就算拼完`);
     if (parts) quest.done("first");
     if (used.size >= 3) quest.done("colors");
-    if (target && right / target >= 0.9) quest.done("finish");
+    if (target ? right / target >= 0.9 : parts >= FREE_GOAL) quest.done("finish");
     storage.set("mb.demo.pixel", { guide: st.guide, cells: st.cells });
   }
 

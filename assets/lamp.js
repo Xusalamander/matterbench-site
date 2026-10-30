@@ -21,6 +21,10 @@
   const rgbToHex = (r, g, b) => "#" + [r, g, b].map((v) => Math.round(Math.min(255, Math.max(0, v))).toString(16).padStart(2, "0")).join("").toUpperCase();
   const luma = ([r, g, b]) => (0.2126 * r + 0.7152 * g + 0.0722 * b) / 255;
   const isLight = (hex) => luma(hexToRgb(hex)) > 0.67;
+  // 豆子描边:颜色和底色太接近(深色底上的黑豆、浅色底上的白豆、黄豆)时描一圈明显的边
+  const rim = (c, bg) => (Math.abs(luma(hexToRgb(c)) - luma(hexToRgb(bg))) < 0.22
+    ? (luma(hexToRgb(bg)) > 0.5 ? "rgba(0,0,0,.42)" : "rgba(255,255,255,.5)")
+    : isLight(c) ? "rgba(0,0,0,.18)" : "rgba(255,255,255,.18)");
   const toCss = (r, g, b) => `rgb(${Math.round(r * 255)},${Math.round(g * 255)},${Math.round(b * 255)})`;
   function hsv(h, s, v) {
     const i = Math.floor(h * 6), f = h * 6 - i, p = v * (1 - s), q = v * (1 - f * s), t = v * (1 - (1 - f) * s);
@@ -328,7 +332,7 @@
         }
         g.fillStyle = c;
         g.beginPath(); g.arc(cx, cy, cell * 0.46, 0, Math.PI * 2); g.fill();
-        g.strokeStyle = isLight(c) ? "rgba(0,0,0,.18)" : "rgba(255,255,255,.16)";
+        g.strokeStyle = rim(c, boardBg);
         g.lineWidth = Math.max(1, cell * 0.04); g.stroke();
         g.fillStyle = isLight(c) ? "rgba(0,0,0,.18)" : "rgba(255,255,255,.22)";
         g.beginPath(); g.arc(cx, cy, cell * 0.17, 0, Math.PI * 2); g.fill();

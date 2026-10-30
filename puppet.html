@@ -71,11 +71,24 @@
             <span class="layer-tag" id="selLayer">—</span>
             <button class="btn-sub" id="layerFront">往前一层</button>
           </div>
+          <p class="sel-hint" id="selHint" hidden></p>
         </div>
       </section>
 
       <section class="grp">
-        <h4>分层 <span class="tip" title="每个关节是一根销子,穿过两根豆条上的孔。连在同一个关节上的两根豆条必须在不同的层,不然销子穿不过去;同一层里的豆条也不能叠在一起。">i</span></h4>
+        <h4>分层</h4>
+        <p class="fine" style="text-align:left">实物是一层一层叠起来的:关节是一根销子,穿过两根豆条的孔。所以连在一起的两根要一前一后,不能在同一层。</p>
+        <div class="layer-demo" aria-hidden="true">
+          <figure>
+            <svg viewBox="0 0 120 56"><rect x="8" y="14" width="70" height="10" rx="5" class="ld-a"/><rect x="42" y="30" width="70" height="10" rx="5" class="ld-b"/><line x1="60" y1="6" x2="60" y2="48" class="ld-pin"/></svg>
+            <figcaption>一前一后,销子穿得过 ✓</figcaption>
+          </figure>
+          <figure>
+            <svg viewBox="0 0 120 56"><rect x="8" y="22" width="70" height="10" rx="5" class="ld-a"/><rect x="42" y="22" width="70" height="10" rx="5" class="ld-b ld-x"/><line x1="60" y1="10" x2="60" y2="44" class="ld-pin ld-bad"/></svg>
+            <figcaption>同一层,挤在一起装不上 ✗</figcaption>
+          </figure>
+        </div>
+        <p class="fine" style="text-align:left">点上面的「分层看」,能看到每根豆条在第几层。</p>
         <div class="layer-list" id="layerList"></div>
         <ul class="checks-s" id="checks"></ul>
       </section>

@@ -185,13 +185,16 @@
     const bead = (cx, cy, col) => {
       if (!fx.body) { // 图纸:空心圈 + 一点底色
         g.globalAlpha = 0.16; g.fillStyle = col; g.beginPath(); g.arc(cx, cy, cell * 0.44, 0, Math.PI * 2); g.fill();
-        g.globalAlpha = col === INK ? 0.35 : 0.9; g.strokeStyle = col === INK ? "#5B606B" : col; g.lineWidth = 1.6;
+        g.globalAlpha = col === INK ? 0.75 : 0.9; g.strokeStyle = col === INK ? "#8C9099" : col; g.lineWidth = 1.6;
         g.beginPath(); g.arc(cx, cy, cell * 0.38, 0, Math.PI * 2); g.stroke(); g.globalAlpha = 1;
         return;
       }
       if (fx.light && col !== INK) { g.shadowColor = col; g.shadowBlur = 12 * k * pulse; }
       g.fillStyle = col; g.beginPath(); g.arc(cx, cy, cell * 0.47, 0, Math.PI * 2); g.fill();
       g.shadowBlur = 0;
+      if (!isLight(col) && parseInt(col.slice(1, 3), 16) + parseInt(col.slice(3, 5), 16) + parseInt(col.slice(5, 7), 16) < 200) { // 黑豆在深色底上:描一圈亮边
+        g.strokeStyle = "rgba(255,255,255,.42)"; g.lineWidth = 1.2; g.beginPath(); g.arc(cx, cy, cell * 0.44, 0, Math.PI * 2); g.stroke();
+      }
       g.fillStyle = isLight(col) ? "rgba(0,0,0,.18)" : "rgba(255,255,255,.2)";
       g.beginPath(); g.arc(cx, cy, cell * 0.16, 0, Math.PI * 2); g.fill();
     };

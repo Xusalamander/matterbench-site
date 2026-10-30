@@ -161,25 +161,63 @@
   $("#drawBtn").addEventListener("click", adopt);
   $("#nick").addEventListener("keydown", (e) => { if (e.key === "Enter") adopt(); });
 
-  // ---- 领奖、下载 ----
-  $("#claimBtn").addEventListener("click", async () => {
+  // ---- 复制领奖码、分享 ----
+  async function copyCode(from) {
     if (!pet) return;
     const code = C.claimCode(pet.seed, passed);
     let ok = false;
-    try { await navigator.clipboard.writeText(code); ok = true; } catch { /* 没权限就让他手抄 */ }
-    $("#claimMsg").textContent = ok ? " 已复制 ✓" : " 复制没成功,请手动抄一下。";
-  });
-  $("#dlBtn").addEventListener("click", () => {
+    try { await navigator.clipboard.writeText(code); ok = true; } catch { /* 没权限 */ }
+    if (!ok) { // 退一步:选中那串码,让他长按 / Ctrl+C
+      const r = document.createRange(); r.selectNodeContents($("#codeText"));
+      const sel = getSelection(); sel.removeAllRanges(); sel.addRange(r);
+      try { ok = document.execCommand("copy"); } catch { /* 忽略 */ }
+    }
+    const btn = $("#copyBtn");
+    btn.textContent = ok ? "已复制 ✓" : "请手动复制"; btn.classList.toggle("is-ok", ok);
+    clearTimeout(copyCode.t); copyCode.t = setTimeout(() => { btn.textContent = "复制"; btn.classList.remove("is-ok"); }, 2500);
+    toast(ok
+      ? `领奖码 ${code} 已复制` + (from === "claim" ? ",到报名表的「伙伴卡号」一栏粘贴。" : "。")
+      : "没能自动复制:领奖码已经选中,长按或 Ctrl+C 复制。");
+  }
+  $("#copyBtn").addEventListener("click", () => copyCode("copy"));
+  $("#claimBtn").addEventListener("click", () => copyCode("claim"));
+
+  // 分享图:卡片 + 二维码。二维码指向在线体验,朋友扫了就能领养自己的
+  const SHARE_URL = "https://matterbench.easyfdm.xyz/demo?utm_source=card";
+  function shareImage() {
+    const W = 1080, H = 1720, out = document.createElement("canvas"); out.width = W; out.height = H;
+    const g = out.getContext("2d");
+    g.fillStyle = "#0F1013"; g.fillRect(0, 0, W, H);
+    const k = 2.6, card = document.createElement("canvas"); card.width = 360 * k; card.height = 504 * k;
+    C.drawCard(card.getContext("2d"), pet, k, 1, nick, date, { ...fx, t: Math.PI / 6.4 }); // 手举起来的那一帧
+    g.drawImage(card, (W - card.width) / 2, 56);
+    // 二维码,白底留边
+    const qr = qrcode(0, "M"); qr.addData(SHARE_URL); qr.make();
+    const n = qr.getModuleCount(), q = 220, m = q / (n + 8), qx = 92, qy = 56 + card.height + 48;
+    g.fillStyle = "#FFFFFF"; g.beginPath(); g.roundRect(qx, qy, q, q, 16); g.fill();
+    g.fillStyle = "#16181D";
+    for (let r = 0; r < n; r++) for (let c = 0; c < n; c++) if (qr.isDark(r, c)) g.fillRect(qx + (c + 4) * m, qy + (r + 4) * m, Math.ceil(m), Math.ceil(m));
+    const F = '"Segoe UI", "PingFang SC", "Microsoft YaHei", sans-serif', tx = qx + q + 44;
+    g.fillStyle = "#E6E7EA"; g.font = `800 44px ${F}`; g.fillText("扫码领养你的拼豆伙伴", tx, qy + 66);
+    g.fillStyle = "#8C9099"; g.font = `500 28px ${F}`;
+    g.fillText("带它闯三关,学会发光和可动", tx, qy + 120);
+    g.fillText("闯得越多,能领的小奖品越好", tx, qy + 162);
+    g.fillStyle = "#C6F04A"; g.font = `700 26px ${F}`; g.fillText("matterbench.easyfdm.xyz", tx, qy + 208);
+    return new Promise((res) => out.toBlob(res, "image/png"));
+  }
+  $("#shareBtn").addEventListener("click", async () => {
     if (!pet) return;
-    const out = document.createElement("canvas"); out.width = 1080; out.height = 1512;
-    C.drawCard(out.getContext("2d"), pet, 3, 1, nick, date, { ...fx, t: Math.PI / 6.4 }); // 手举起来的那一帧
-    out.toBlob((blob) => {
-      if (!blob) return;
-      const a = document.createElement("a");
-      a.href = URL.createObjectURL(blob); a.download = `拼豆伙伴卡-${pet.code}.png`;
-      document.body.appendChild(a); a.click();
-      setTimeout(() => { URL.revokeObjectURL(a.href); a.remove(); }, 500);
-    });
+    const blob = await shareImage(); if (!blob) return;
+    const file = new File([blob], `拼豆伙伴卡-${pet.code}.png`, { type: "image/png" });
+    if (navigator.canShare && navigator.canShare({ files: [file] })) { // 手机:直接调起系统分享
+      try { await navigator.share({ files: [file], title: "我的拼豆伙伴", text: `来看看我的拼豆伙伴「${pet.name}」,你也来领养一只:${SHARE_URL}` }); return; }
+      catch (e) { if (e && e.name === "AbortError") return; }
+    }
+    const a = document.createElement("a");
+    a.href = URL.createObjectURL(blob); a.download = file.name;
+    document.body.appendChild(a); a.click();
+    setTimeout(() => { URL.revokeObjectURL(a.href); a.remove(); }, 500);
+    toast("卡片图已下载,上面有二维码,发给朋友扫一扫就能领养。");
   });
 
   // ---- 进页面 ----
