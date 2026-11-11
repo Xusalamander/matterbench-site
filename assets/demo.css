@@ -498,4 +498,13 @@ table.bom .muted { color: var(--text-2); }
 .more-box[open] > summary::before { content: "▾ "; }
 .more-box > .grp { padding-left: 0; padding-right: 0; }
 .more-box > .grp:last-child { border-bottom: 0; padding-bottom: 0; }
-@media (max-width: 760px) { .stage-card { top: 56px; left: 10px; max-width: calc(100% - 20px); padding: 8px 10px; } .stage-card p { font-size: 11px; } }
+/* 手机:卡片贴在画面顶上;右上角有视图切换或开灯按钮时,卡片往下让一行。工具紧跟在技能条下面(任务清单和卡片重复,收起来) */
+@media (max-width: 760px) {
+  .stage-card { top: 10px; left: 10px; max-width: calc(100% - 20px); padding: 8px 10px; }
+  .stage-card p { font-size: 11px; }
+  .view:has(> .view-tabs:not([hidden])) > .stage-card, .view:has(> .lamp-switch:not([hidden])) > .stage-card { top: 56px; }
+  .lamp-switch { top: 12px; right: 160px; }
+  .view:has(> .view-tabs[hidden]) > .lamp-switch { right: 14px; }
+  .quest .quest-list, .quest .quest-note { display: none; }
+  .quest .quest-bar { margin-bottom: 0; }
+}

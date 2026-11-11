@@ -21,7 +21,7 @@
   const pet = window.MBCard && myCard && Number.isInteger(myCard.seed) ? MBCard.makeCard(myCard.seed) : null;
   const petName = pet ? pet.name : "你的伙伴";
   const PCELLS = pet ? pet.cells.map((row) => row.map(Boolean)) : null;
-  const hydrate = (p) => (p.type === "pal" ? { ...p, cells: PCELLS } : p); // 伙伴的形状不存档,按卡片现算
+  const hydrate = (p) => (p.type === "pal" ? { mount: "feet", ...p, cells: PCELLS } : p); // 伙伴的形状不存档,按卡片现算
   const BEAD_COLORS = [...new Set([pet ? pet.body : "#E5484D", "#E5484D", "#F28B2E", "#F5D547", "#3DB86B", "#3E63DD", "#F6E7DA", "#16181D"])];
 
   // ---- 跟着搭:每一步只学一个动作,放在发光的位置 ----
@@ -36,19 +36,29 @@
     { id: "g3", tool: "rod", act: "换零件", label: "用圆棒立起另一条腿", title: "另一条腿:换圆棒",
       tip: "一颗颗叠太慢?圆棒就是一整根连起来的拼豆,一样粗。点「零件」里的「圆棒」,再点发光的位置,一下就立好。",
       targets: [{ type: "rod", A: 2, c: [8, 6, 0], n: 2 }] },
-    { id: "g4", tool: "strip", act: "换零件", label: "搭上肩膀", title: "搭上肩膀",
-      tip: "扁条每 10 mm 一个孔。换「扁条」,点发光的位置,两头的孔正好套进两条腿,伙伴就有了肩膀。",
-      targets: [{ type: "strip", A: 2, R: 0, c: [4, 6, 1], s: 2, n: 5 }] },
+    { id: "g4", tool: "strip", act: "换零件", label: "搭上两层肩膀", title: "搭上两层肩膀",
+      tip: "扁条每 10 mm 一个孔。换「扁条」,点两个发光的位置,上下各一层,两头的孔都套进两条腿。两层夹着,待会儿伙伴的脚插进去又深又稳。",
+      targets: [{ type: "strip", A: 2, R: 0, c: [4, 6, 1], s: 1, n: 5 }, { type: "strip", A: 2, R: 0, c: [4, 6, 1], s: 3, n: 5 }] },
     { id: "g5", tool: "clip", act: "孔就是关节(和第 3 关一样)", label: "装一只能转的手臂", title: "装一只能转的手臂",
       tip: "卡扣只套着一条腿、别的都不碰,就能绕着腿转。换「卡扣」,点发光的位置,给伙伴装上手臂。",
-      targets: [{ type: "clip", A: 2, R: 0, c: [8, 6, 0], s: 3, n: 2 }] },
+      targets: [{ type: "clip", A: 2, R: 0, c: [8, 6, 0], s: 3, n: 1 }] },
     ...(pet ? [{ id: "g6", tool: "pal", act: "伙伴也是零件", label: `让${petName}站上肩膀`, title: `让${petName}站上去`,
-      tip: `${petName}本身也是拼豆:卡片上的 14×14 颗直径 5 mm 的豆烫成一块 70×70 mm 的板。板底下有两颗竖着的「脚豆」,相距 20 mm,正好插进肩膀的孔。点「零件」里的「伙伴」,再点发光的位置。`,
+      tip: `${petName}本身也是拼豆:卡片上的 14×14 颗直径 5 mm 的豆烫成一块 70×70 mm 的板。板底下有两只竖着的脚,每只是两颗豆叠起来(10 mm),相距 20 mm,穿过上下两层肩膀的孔。点「零件」里的「伙伴」,再点发光的位置。`,
       targets: [hydrate({ type: "pal", c: [6, 6, 2], s: 0 })] }] : []),
   ];
+  // 过关后的进阶:做个转台。柱子上套一个卡扣,伙伴换成一只脚,插在卡扣另一个孔里,跟着卡扣绕柱子转
+  const ADV = pet ? [
+    { tool: "rod", title: "立一根柱子", act: "换零件", tip: "在空地上立一根 30 mm 的圆棒,当转台的轴。点「圆棒」,再点发光的位置。",
+      target: { type: "rod", A: 2, c: [9, 2, 0], n: 3 } },
+    { tool: "clip", title: "柱子上套一个卡扣", act: "卡扣当转台", tip: "卡扣一个孔套在柱子上,另一个孔空着,等会儿插伙伴的脚。点「卡扣」,再点发光的位置。",
+      target: { type: "clip", A: 2, R: 0, c: [9, 2, 2], s: 2, n: 1 } },
+    { tool: "pal", title: `${petName}换成一只脚`, act: "换站法", tip: `点「伙伴」,在「放置」里把站法换成「一只脚,能转」,再点发光的位置。${petName}会从肩膀上搬过来,脚插进卡扣的另一个孔。`,
+      target: hydrate({ type: "pal", c: [10, 2, 3], s: 1, mount: "pivot" }) },
+  ] : [];
   const quest = MBQuest.init({ level: "build", manual: true, tasks: GUIDE.map((g) => ({ id: g.id, label: g.label })) }); // 进度按零件算,卡片自己画
   const saved = storage.get("mb.demo.build") || {};
   let free = !!saved.free || !!passed.build; // 跟着搭做完(或以前过了关)才能自由搭
+  let advDone = !!saved.advDone;
 
   // ---- 3D 场景 ----
   const renderer = new THREE.WebGLRenderer({ antialias: true });
@@ -129,7 +139,7 @@
     world.add(p);
     const mesh = buildMesh(p, p.type === "pal" ? null : baseMat(p)); mesh.userData.part = p; scene.add(mesh); meshes.set(p.id, mesh);
   }
-  const dispose = (o) => o.traverse((c) => { if (c.geometry) c.geometry.dispose(); });
+  const dispose = (o) => o.traverse((c) => { if (c.geometry && !c.geometry.userData.shared) c.geometry.dispose(); });
   const setMat = (o, mat) => { if (o.isMesh) o.material = mat; else o.traverse((c) => { if (c.isMesh) c.material = mat; }); };
   function removePart(p) {
     const mesh = meshes.get(p.id); scene.remove(mesh); dispose(mesh); meshes.delete(p.id);
@@ -138,7 +148,7 @@
   const userParts = () => world.parts.filter((p) => !p.base);
   const plain = (p) => {
     const o = { type: p.type, A: p.A, c: p.c.slice(), n: p.n };
-    if (p.type === "pal") return { type: "pal", c: p.c.slice(), s: p.s || 0 };
+    if (p.type === "pal") return { type: "pal", c: p.c.slice(), s: p.s || 0, mount: p.mount || "feet" };
     if (p.type === "bead") { o.s = p.s || 0; o.color = p.color || BEAD_COLORS[0]; }
     else if (p.type !== "rod") { o.R = p.R; o.s = p.s; }
     return o;
@@ -146,7 +156,7 @@
   const clone = (p, d = [0, 0, 0]) => hydrate({ ...plain(p), c: [p.c[0] + d[0], p.c[1] + d[1], p.c[2] + d[2]] });
   const inBounds = (p) => p.c[0] >= -2 && p.c[0] <= 14 && p.c[1] >= -2 && p.c[1] <= 14 && p.c[2] >= 0 && p.c[2] <= 14;
   // 同一个零件(不管颜色):用来认「发光的位置放好了没有」
-  const sig = (p) => JSON.stringify([p.type, p.A, p.R ?? null, p.c, p.s || 0, p.n]);
+  const sig = (p) => JSON.stringify([p.type, p.A, p.R ?? null, p.c, p.s || 0, p.n, p.mount ?? null]);
   const placedSigs = () => new Set(userParts().map(sig));
   function commit(ops) { if (!ops.length) return; undoStack.push(ops); if (undoStack.length > 200) undoStack.shift(); redoStack = []; }
   function applyOps(ops, reverse) {
@@ -165,12 +175,12 @@
     commit([...olds.map((p) => ({ op: "del", part: p })), ...news.map((p) => ({ op: "add", part: p }))]);
     return true;
   }
-  const valid = (o) => (o && o.type === "pal" ? !!PCELLS && Array.isArray(o.c) && o.c.length === 3 && o.c.every(Number.isInteger) && [0, 1, 2, 3].includes(o.s || 0) : validPart(o));
+  const valid = (o) => (o && o.type === "pal" ? !!PCELLS && Array.isArray(o.c) && o.c.length === 3 && o.c.every(Number.isInteger) && [0, 1, 2, 3].includes(o.s || 0) && [undefined, "feet", "pivot"].includes(o.mount) : validPart(o));
   const validPart = (o) => o && ["bead", "rod", "strip", "clip"].includes(o.type) && Array.isArray(o.c) && o.c.length === 3 && o.c.every(Number.isInteger)
     && [0, 1, 2].includes(o.A) && Number.isInteger(o.n) && o.n >= LIM[o.type][0] && o.n <= LIM[o.type][1]
     && (o.type !== "bead" || (/^#[0-9A-Fa-f]{6}$/.test(o.color || "") && [0, 1].includes(o.s || 0)))
     && (o.type === "rod" || o.type === "bead" || ([0, 1, 2].includes(o.R) && o.R !== o.A && Number.isInteger(o.s) && o.s >= 0 && o.s <= 3));
-  const save = () => storage.set("mb.demo.build", { free, parts: userParts().map(plain) });
+  const save = () => storage.set("mb.demo.build", { free, advDone, parts: userParts().map(plain) });
 
   // ---- 跟着搭的进度:按世界里已经放好的零件算,撤销也跟着退 ----
   function guideAt() {
@@ -180,6 +190,9 @@
   }
   const nextTarget = (g) => { const have = placedSigs(); return g.targets.find((t) => !have.has(sig(t))); };
   let doneMax = 0; // 打过勾的步数(任务清单的勾只加不减)
+  // 进阶转台到第几步(-1:没开始或已经做完)
+  const advAt = () => { if (!free || advDone || !ADV.length) return -1; const have = placedSigs(); const i = ADV.findIndex((a) => !have.has(sig(a.target))); return i; };
+  const advTarget = (tool) => { const i = advAt(); return i >= 0 && ADV[i].tool === tool ? ADV[i].target : null; };
   const unlocked = (tool) => free || tool === "bead" || GUIDE.findIndex((g) => g.tool === tool) <= guideAt();
 
   // ---- 放置参数(自由搭用) ----
@@ -188,7 +201,7 @@
     rod: [{ A: 2 }, { A: 0 }, { A: 1 }],
     strip: [{ A: 2, R: 0 }, { A: 2, R: 1 }, { A: 0, R: 2 }, { A: 0, R: 1 }, { A: 1, R: 2 }, { A: 1, R: 0 }],
     clip: [{ A: 2, R: 0 }, { A: 2, R: 1 }, { A: 0, R: 1 }, { A: 0, R: 2 }, { A: 1, R: 0 }, { A: 1, R: 2 }],
-    pal: [{}],
+    pal: [{ mount: "feet" }, { mount: "pivot" }], // 站法:两只脚 / 一只脚(插在卡扣上能转)
   };
   const LIM = { bead: [1, 1], rod: [1, 16], strip: [2, 12], clip: [1, 4] };
   const NAMES = { bead: "拼豆", rod: "圆棒", strip: "扁条", clip: "卡扣", pal: "伙伴" };
@@ -212,11 +225,11 @@
     }
     return null;
   }
-  function dropPal(p) { // 伙伴也往下落:脚豆碰到底板或零件就停(脚豆在板底下 5 mm,所以最低 5 mm)
-    for (let k = 56; k >= 2; k--) {
+  function dropPal(p) { // 伙伴也往下落:脚碰到底板或零件就停(脚在板底下 10 mm,所以板底最低 10 mm)
+    for (let k = 56; k >= L.FOOT_Q; k--) {
       const q = hydrate({ ...p, c: [p.c[0], p.c[1], k >> 2], s: k & 3 });
       if (!world.canPlace(q)) return k < 56 ? hydrate({ ...p, c: [p.c[0], p.c[1], (k + 1) >> 2], s: (k + 1) & 3 }) : null;
-      if (k === 2) return q;
+      if (k === L.FOOT_Q) return q;
     }
     return null;
   }
@@ -233,7 +246,14 @@
       const t = nextTarget(g);
       return t && nearTarget(t) ? hydrate({ ...t, c: t.c.slice() }) : null;
     }
-    if (st.tool === "pal") return PCELLS ? dropPal({ type: "pal", c: [st.cell[0], st.cell[1], 0], s: 0 }) : null;
+    if (st.tool === "pal") {
+      if (!PCELLS) return null;
+      const t = advTarget("pal"); // 进阶「转台」:站法对了就吸到发光的位置
+      if (t && ORI.pal[st.ori.pal].mount === "pivot" && nearTarget(t)) return hydrate({ ...t, c: t.c.slice() });
+      return dropPal({ type: "pal", c: [st.cell[0], st.cell[1], 0], s: 0, mount: ORI.pal[st.ori.pal].mount });
+    }
+    const adv = advTarget(st.tool);
+    if (adv && nearTarget(adv)) return { ...adv, c: adv.c.slice() };
     const o = ORI[st.tool][st.ori[st.tool]];
     const p = { type: st.tool, A: o.A, c: [st.cell[0], st.cell[1], st.h], n: st.n[st.tool] };
     if (st.tool === "bead") { p.s = 0; p.color = st.color; return dropBead(p); }
@@ -246,20 +266,23 @@
   function showTargets() {
     targetMeshes.forEach((m) => { scene.remove(m); dispose(m); });
     targetMeshes = [];
-    if (free || steps.on) return;
-    const g = GUIDE[guideAt()], have = placedSigs();
-    if (!g) return;
-    for (const t of g.targets) if (!have.has(sig(t))) { const m = buildMesh(t, mats.target); scene.add(m); targetMeshes.push(m); }
+    if (steps.on) return;
+    const have = placedSigs(), a = advAt();
+    const list = !free ? (GUIDE[guideAt()] || { targets: [] }).targets : a >= 0 ? [ADV[a].target] : [];
+    for (const t of list) if (!have.has(sig(t))) { const m = buildMesh(t, mats.target); scene.add(m); targetMeshes.push(m); }
   }
 
   // ---- 伙伴的样子:和卡片同一套技能 ----
   // 没学会「拼出身体」:半透明的图纸;「发光」:豆子自己亮、身前一团光;「可动」:两侧各一根 3 颗的豆条手臂在挥
-  const tubeGeo = (axis) => { // 拼豆小圆管,沿 three 的 z(axis "z")或 y(axis "y")
+  const tubeGeos = {};
+  const tubeGeo = (axis) => { // 拼豆小圆管,沿 three 的 z(axis "z")或 y(axis "y");两种各做一次,大家共用
+    if (tubeGeos[axis]) return tubeGeos[axis];
     const sh = new THREE.Shape(); sh.absarc(0, 0, 2.45, 0, Math.PI * 2, false);
     const hole = new THREE.Path(); hole.absarc(0, 0, 1.1, 0, Math.PI * 2, true); sh.holes.push(hole);
     const g = new THREE.ExtrudeGeometry(sh, { depth: 5, bevelEnabled: false, curveSegments: 14 });
     g.translate(0, 0, -2.5); if (axis === "y") g.rotateX(-Math.PI / 2);
-    return g;
+    g.userData.shared = true;
+    return (tubeGeos[axis] = g);
   };
   function buildPalMesh(p, mat) {
     const look = fx(), N = L.PAL_N, group = new THREE.Group();
@@ -276,10 +299,10 @@
       inst.setMatrixAt(k, mm); if (!mat) inst.setColorAt(k, col.set(c));
     });
     group.add(inst);
-    // 两颗脚豆:竖着,插进下面的孔
-    for (const f of L.PAL_FEET) {
+    // 脚:每只两颗豆叠起来,竖着插进下面的孔
+    for (const f of L.palFeet(p)) for (let k = 0; k < L.FOOT_Q / 2; k++) {
       const foot = new THREE.Mesh(tubeGeo("y"), mat || beadMat(pet.body));
-      foot.position.set((cx + 4 * f) * QMM, (zb - 1) * QMM, cy * QMM); group.add(foot);
+      foot.position.set((cx + 4 * f) * QMM, (zb - 1 - 2 * k) * QMM, cy * QMM); group.add(foot);
     }
     group.userData.arms = [];
     if (!mat && look.move) { // 手臂:销子穿过身体边上那颗豆,和卡片、第 3 关一样
@@ -372,9 +395,15 @@
       b.title = ok ? "" : "跟着搭到这一步就解锁";
     });
     $("toolNote").textContent = free ? "" : "跟着搭的时候,零件会自动对齐到发光的位置,不用调参数。";
-    $("params").hidden = !free || !isPart || t === "pal"; $("selSec").hidden = !free || t !== "sel";
+    $("params").hidden = !free || !isPart; $("selSec").hidden = !free || t !== "sel";
     document.querySelectorAll('#tools [data-tool="pal"]').forEach((b) => { b.hidden = !pet; });
-    if (free && isPart && t !== "pal") {
+    if (free && t === "pal") {
+      $("beadColors").hidden = true; $("row-n").hidden = true; $("row-h").hidden = true; $("row-s").hidden = true;
+      $("rot").textContent = ORI.pal[st.ori.pal].mount === "pivot" ? "站法:一只脚,能转" : "站法:两只脚";
+      $("rule").textContent = ORI.pal[st.ori.pal].mount === "pivot"
+        ? "正中一只脚(两颗豆,10 mm),插在卡扣的另一个孔里,卡扣绕柱子转,伙伴就跟着转。"
+        : "两只脚相距 20 mm,穿过一根扁条上隔一个孔的两个孔;上下两层扁条最稳。";
+    } else if (free && isPart) {
       const o = ORI[t][st.ori[t]], n = st.n[t];
       $("beadColors").hidden = t !== "bead";
       $("rot").textContent = t === "bead" || t === "rod" ? AX[o.A] : `平面朝${AX[o.A]} · 沿${AX[o.R]}`;
@@ -393,10 +422,13 @@
   }
   // 跟着搭每完成一步打勾;全部搭完就过关、解锁自由搭
   function progress() {
-    if (free) return;
+    if (free) {
+      if (!advDone && ADV.length && advAt() < 0 && info.turntables.length) { advDone = true; toastNew(`转台做好了!${petName}能跟着卡扣绕柱子转身了`); }
+      return;
+    }
     const at = guideAt();
     while (doneMax < at) { quest.done(GUIDE[doneMax].id); doneMax++; }
-    if (at >= GUIDE.length) { free = true; applySkills(); cam.r = 300; cam.target.set(60, 34, 60); placeCamera(); toastNew(pet ? `${petName}站上了你搭的骨架,学会了「搭骨架」!自由搭解锁了` : "骨架搭好了!自由搭解锁了"); }
+    if (at >= GUIDE.length && !free) { free = true; applySkills(); cam.r = 300; cam.target.set(60, 34, 60); placeCamera(); toastNew(pet ? `${petName}站上了你搭的骨架,学会了「搭骨架」!自由搭解锁了` : "骨架搭好了!自由搭解锁了"); }
   }
   function renderBeadColors() {
     const box = $("beadColors"); box.innerHTML = "";
@@ -408,10 +440,18 @@
       box.appendChild(b);
     });
   }
+  // 卡扣的四种用法,结构检查和选中时都这么说
+  function roleText(p, r) {
+    const name = `「${partName(p)}」`;
+    if (r.role === "hinge") return `${name}是关节:只套着一根棒、别的都不碰,能绕它转`;
+    if (r.role === "turntable") return `${name}是转台:套在柱子上,带着「${r.carried.map(partName).join("、")}」一起转`;
+    if (r.role === "link") return `${name}把两根棒连在一起,间距固定在 10 mm`;
+    return `${name}贴着别的零件套在棒上,是限位圈,卡住高度`;
+  }
   function renderSel() {
     if (st.tool !== "sel") return;
-    const n = sel.size;
-    $("selInfo").textContent = flash || (n ? `已选 ${n} 个` + (n === 1 ? ":" + partName([...sel][0]) : "零件") + "。方向键也能移动。" : "点一个零件选中它,按住 Shift 多选。");
+    const n = sel.size, one = n === 1 ? [...sel][0] : null, role = one && info.roles.get(one);
+    $("selInfo").textContent = flash || (n ? (role ? roleText(one, role) + "。" : `已选 ${n} 个` + (one ? ":" + partName(one) : "零件") + "。") + "方向键也能移动。" : "点一个零件选中它,按住 Shift 多选。");
     $("selTools").querySelectorAll("button").forEach((b) => { b.disabled = !n; });
   }
   function renderCheck() {
@@ -421,7 +461,8 @@
     const items = [
       ...info.floating.map((p) => ["warn", `「${partName(p)}」没连到任何东西,会掉下来`, p]),
       ...info.touchOnly.map((p) => ["info", `「${partName(p)}」只是靠着,没有穿孔,要胶或压紧`, p]),
-      ...info.pivots.map((p) => ["ok", `「${partName(p)}」只套着一根圆棒,能绕它转`, p]),
+      ...info.pivots.filter((p) => p.type !== "clip").map((p) => ["ok", `「${partName(p)}」只套着一根圆棒,能绕它转`, p]),
+      ...[...info.roles].map(([p, r]) => ["ok", roleText(p, r), p]),
     ];
     const ul = $("issues"); ul.innerHTML = "";
     if (!items.length) { const li = document.createElement("li"); li.textContent = ups.length ? "每个零件都连到了底板上。" : "还没有零件。"; ul.appendChild(li); return; }
@@ -451,7 +492,7 @@
     });
     const tube = L.isTube(p), pal = p.type === "pal", how = [];
     if (base) how.push(tube || pal ? "插进底板的孔" : "放在底板上");
-    if (pinTo.length) how.push(pal ? "两颗脚豆插进第 " + pinTo.join("、") + " 步的孔" : (tube ? "穿过第 " : "套在第 ") + pinTo.join("、") + " 步的" + (tube ? "孔" : "圆棒上"));
+    if (pinTo.length) how.push(pal ? (p.mount === "pivot" ? "一只脚插进第 " : "两只脚插进第 ") + pinTo.join("、") + " 步的孔" : (tube ? "穿过第 " : "套在第 ") + pinTo.join("、") + " 步的" + (tube ? "孔" : "圆棒上"));
     if (touchTo.length) how.push((p.type === "bead" ? "叠在第 " : "贴着第 ") + touchTo.join("、") + " 步" + (p.type === "bead" ? "上" : ""));
     $("stepTxt").textContent = `第 ${steps.k} / ${N} 步:装「${partName(p)}」,高 ${L.describe(p).min[2] * QMM} mm` + (how.length ? "," + how.join(",") : "") + "。"
       + (steps.k === N && info.floating.length ? ` 另有 ${info.floating.length} 个零件没连上,没算进步骤。` : "");
@@ -471,12 +512,16 @@
     const at = guideAt(), g = GUIDE[at];
     if (!free && g) {
       const left = g.targets.filter((t) => !placedSigs().has(sig(t))).length;
-      quest.card({ no: `第 4 关 · 第 ${at + 1} 步 / ${GUIDE.length}`, title: g.title, tip: g.tip, act: g.act, prog: g.targets.length > 1 ? `还差 ${left} 颗` : "", flash: flashMsg });
+      quest.card({ no: `第 4 关 · 第 ${at + 1} 步 / ${GUIDE.length}`, title: g.title, tip: g.tip, act: g.act, prog: g.targets.length > 1 ? `还差 ${left} ${g.tool === "bead" ? "颗" : "根"}` : "", flash: flashMsg });
+    } else if (advAt() >= 0) {
+      const a = advAt(), step = ADV[a];
+      const wrongStance = step.tool === "pal" && st.tool === "pal" && ORI.pal[st.ori.pal].mount !== "pivot";
+      quest.card({ no: `第 4 关 · 进阶 · 做个转台 ${a + 1} / ${ADV.length}`, title: step.title, tip: step.tip, act: step.act, prog: wrongStance ? "先把站法换成「一只脚,能转」" : "", flash: flashMsg });
     } else {
-      const built = palStanding();
+      const built = palStanding(), tt = info.turntables.length;
       quest.card({
         no: "第 4 关 · 自由搭", title: built ? `${petName}站上了你搭的骨架` : "所有零件都解锁了", flash: flashMsg,
-        tip: (built ? skillLine() : pet ? "「伙伴」也能自己放:脚下两颗豆插进一根扁条上隔一个孔的两个孔。" : "领养一只拼豆伙伴,它也能站到骨架上。") + " 现在可以自己调长度、高度和方向,用「选择」移动、复制;「结构检查」会告诉你哪里会掉、哪里能转。",
+        tip: (tt ? `卡扣转台:${petName}跟着卡扣绕柱子转${fx().move ? "。" : ";过了第 3 关它会自己转起来。"} ` : "") + (built ? skillLine() : pet ? "「伙伴」也能自己放:脚下两颗豆插进一根扁条上隔一个孔的两个孔。" : "领养一只拼豆伙伴,它也能站到骨架上。") + " 现在可以自己调长度、高度和方向,用「选择」移动、复制;「结构检查」会告诉你哪里会掉、哪里能转。",
       });
     }
     $("statusInfo").textContent = free && info.floating.length ? `⚠ ${info.floating.length} 个零件悬空` : `${userParts().length} 个零件 · ${info.pins} 处穿孔 · ${info.touches} 处贴合`;
@@ -540,12 +585,19 @@
   function frame(now) {
     const t = now / 1000;
     if (mats.target) mats.target.opacity = 0.3 + 0.35 * Math.sin(t * 4) ** 2;
-    const swing = fx().move && !steps.on;
+    const swing = fx().move && !steps.on, spin = new Map(); // 零件 → { c, axis, ang }
+    if (swing) {
+      for (const p of info.pivots) { const a = swingAxis(p); if (a) spin.set(p, { ...a, ang: 0.7 * Math.sin(t * 2.2) }); }
+      for (const tt of info.turntables) {
+        const d = L.describe(tt.axis), a = { c: L2T([0, 1, 2].map((k) => (d.min[k] + d.max[k]) / 2)), axis: U[tt.axis.A], ang: 0.9 * Math.sin(t * 1.3) };
+        for (const p of [tt.clip, ...tt.carried]) spin.set(p, a);
+      }
+    }
     meshes.forEach((m) => {
-      const p = m.userData.part, piv = swing && info.pivots.includes(p) && swingAxis(p);
+      const piv = spin.get(m.userData.part);
       if (piv) {
         tmpT.makeTranslation(piv.c.x, piv.c.y, piv.c.z);
-        tmpR.makeRotationAxis(piv.axis, 0.7 * Math.sin(t * 2.2));
+        tmpR.makeRotationAxis(piv.axis, piv.ang);
         tmpM.makeTranslation(-piv.c.x, -piv.c.y, -piv.c.z);
         m.matrix.copy(tmpT).multiply(tmpR).multiply(tmpM).multiply(m.userData.base);
       } else m.matrix.copy(m.userData.base);
@@ -616,7 +668,7 @@
     if (k === "s" && t !== "rod") st.s = (st.s + d + 4) % 4;
     st.over = true; refresh();
   }
-  function rotate() { const t = st.tool; if (!free || !isPartTool(t) || t === "pal") return; st.ori[t] = (st.ori[t] + 1) % ORI[t].length; st.over = true; refresh(); }
+  function rotate() { const t = st.tool; if (!free || !isPartTool(t)) return; st.ori[t] = (st.ori[t] + 1) % ORI[t].length; st.over = true; refresh(); }
   $("tools").addEventListener("click", (e) => { const b = e.target.closest("button"); if (b && !b.disabled) setTool(b.dataset.tool); });
   for (const [id, k] of [["st-n", "n"], ["st-h", "h"], ["st-s", "s"]]) $(id).addEventListener("click", (e) => { const b = e.target.closest("button"); if (b) bump(k, +b.dataset.d); });
   $("rot").addEventListener("click", rotate);

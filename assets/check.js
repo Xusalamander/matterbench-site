@@ -85,8 +85,8 @@
     }
     if (passed.build) { // 过了第 4 关:加两颗脚豆,能插到骨架扁条的孔里
       g.fillStyle = "#5B606B"; g.font = `16px ${F}`;
-      g.fillText(`站上骨架:底边下面,第 ${G / 2 - 2}、${G / 2 - 1} 格中间和第 ${G / 2 + 2}、${G / 2 + 3} 格中间,各竖着粘 1 颗豆当脚(相距 20 mm),`, pad, ly + 4);
-      g.fillText("正好插进扁条上隔一个孔的两个孔里。", pad, ly + 30);
+      g.fillText(`站上骨架:底边下面,第 ${G / 2 - 2}、${G / 2 - 1} 格中间和第 ${G / 2 + 2}、${G / 2 + 3} 格中间,各竖着粘一只脚:两颗豆叠起来(10 mm 长),两只脚相距 20 mm,`, pad, ly + 4);
+      g.fillText("穿过上下两层扁条上隔一个孔的两个孔。想让它能转身:只在正中粘一只脚,插在卡扣上。", pad, ly + 30);
     }
     cv.toBlob((b) => b && save(b, `拼豆图纸-${pet.code}.png`));
   }
@@ -101,7 +101,7 @@
       grid: pet.cells.map((row) => row.map((c) => (c ? sym.get(c) : ".")).join("")),
       arms: passed.puppet ? { beads: 3, color: pet.accent, row: 8 } : null,
       bead_mm: 5, panel_mm: pet.cells.length * 5,
-      feet: passed.build ? { beads: 2, spacing_mm: 20, between_cols: [[pet.cells.length / 2 - 2, pet.cells.length / 2 - 1], [pet.cells.length / 2 + 2, pet.cells.length / 2 + 3]] } : null,
+      feet: passed.build ? { count: 2, beads_each: 2, length_mm: 10, spacing_mm: 20, between_cols: [[pet.cells.length / 2 - 2, pet.cells.length / 2 - 1], [pet.cells.length / 2 + 2, pet.cells.length / 2 + 3]] } : null,
     };
     save(new Blob([JSON.stringify(out, null, 2)], { type: "application/json" }), `拼豆伙伴-${pet.code}.json`);
   }
