@@ -1,4 +1,4 @@
-// 在线体验的主页:先领养一只拼豆伙伴,再带它闯三关点亮技能,最后一个出口「领奖并报名」。
+// 在线体验的主页:先领养一只拼豆伙伴,再带它闯四关点亮技能,最后一个出口「领奖并报名」。
 // 关卡页过关后会带着 ?up=关卡名 回到这里,播一段升级动画。
 (() => {
   "use strict";
@@ -11,7 +11,7 @@
   };
   const ss = { set(k, v) { try { sessionStorage.setItem(k, JSON.stringify(v)); } catch { /* 忽略 */ } } };
   const sleep = (ms) => new Promise((res) => setTimeout(res, ms));
-  const LEVEL_NAME = { pixel: "第 1 关 · 拼豆像素画", lamp: "第 2 关 · 发光灯罩", puppet: "第 3 关 · 会动的豆条小人" };
+  const LEVEL_NAME = { pixel: "第 1 关 · 拼豆像素画", lamp: "第 2 关 · 发光灯罩", puppet: "第 3 关 · 会动的豆条小人", build: "第 4 关 · 立体搭建" };
 
   const canvas = $("#card"), wrapEl = $("#cardWrap"), ctx = canvas.getContext("2d");
   const DPR = Math.min(3, window.devicePixelRatio || 1);
@@ -200,7 +200,7 @@
     const F = '"Segoe UI", "PingFang SC", "Microsoft YaHei", sans-serif', tx = qx + q + 44;
     g.fillStyle = "#E6E7EA"; g.font = `800 44px ${F}`; g.fillText("扫码领养你的拼豆伙伴", tx, qy + 66);
     g.fillStyle = "#8C9099"; g.font = `500 28px ${F}`;
-    g.fillText("带它闯三关,学会发光和可动", tx, qy + 120);
+    g.fillText("带它闯四关,学会发光、可动、搭骨架", tx, qy + 120);
     g.fillText("闯得越多,能领的小奖品越好", tx, qy + 162);
     g.fillStyle = "#C6F04A"; g.font = `700 26px ${F}`; g.fillText("matterbench.easyfdm.xyz", tx, qy + 208);
     return new Promise((res) => out.toBlob(res, "image/png"));
@@ -218,6 +218,17 @@
     document.body.appendChild(a); a.click();
     setTimeout(() => { URL.revokeObjectURL(a.href); a.remove(); }, 500);
     toast("卡片图已下载,上面有二维码,发给朋友扫一扫就能领养。");
+  });
+
+  // 别的标签页过了关或换了伙伴:这里的卡片、技能、奖品马上跟着变
+  window.addEventListener("storage", (e) => {
+    if (e.key === "mb.card") { location.reload(); return; }
+    if (e.key !== "mb.levels" || !pet) return;
+    const before = C.prizeFor(pet, passed).tier;
+    passed = (window.MBQuest && MBQuest.levels()) || {};
+    renderMine(); paint(); loop();
+    const now = C.prizeFor(pet, passed).tier;
+    if (now !== before) toast(`${pet.name}又学会了新技能!奖品升到${now.name}。`);
   });
 
   // ---- 进页面 ----

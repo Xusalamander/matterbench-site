@@ -1,4 +1,5 @@
-// 第 3 关:会动的豆条小人。
+// 第 3 关:会动的豆条小人。默认模板就是你的伙伴:卡片上的图案是一块豆片,两侧各装一根豆条当手臂。
+// 步骤卡片、按步骤出现的工具在 quest.js(四关共用)。
 // 每个零件是一根豆条(一排豆)或一小块豆片;关节 = 一根销子穿过父零件的某个孔和子零件的某个孔,子零件绕它转。
 // 零件分层叠放:连在同一个关节上的两件必须不同层;同一层里的零件不能叠在一起。
 // 单位:1 = 一颗豆的间距。角度:度,0 = 朝右,90 = 朝下(屏幕坐标)。
@@ -48,6 +49,30 @@
   const DOGHEAD = plate(["o....", "ooEo.", "ooooN", "Pooo."]);
   const BASE = plate(["ooPoo", "ooooo"]);
   const MARK_COLORS = { E: "#16181D", M: "#E5484D", N: "#16181D" };
+  const markColor = (m) => MARK_COLORS[m] || m; // 伙伴豆片每颗豆直接记颜色
+
+  // ---- 你的伙伴:整张图案一块豆片,转轴在正中;第 8 行最外侧那颗身体豆上各挂一根 3 颗的豆条当手臂(和卡片、第 4 关一样) ----
+  const myCard = storage.get("mb.card");
+  const pet = window.MBCard && myCard && Number.isInteger(myCard.seed) ? MBCard.makeCard(myCard.seed) : null;
+  const petName = pet ? pet.name : "伙伴";
+  function palTemplate() {
+    const G = pet.cells.length, C0 = G >> 1, cells = [], marks = {};
+    pet.cells.forEach((row, y) => row.forEach((c, x) => { if (c) { const k = [x - C0, y - C0]; cells.push(k); marks[k.join(",")] = c; } }));
+    const row = pet.cells[7], xl = row.findIndex((v) => v && v !== "#16181D");
+    return {
+      name: "我的伙伴",
+      root: { x: 0, y: -1 },
+      pieces: [
+        { id: "body", name: "身体", kind: "plate", cells, marks, parent: null, rest: 0, layer: 0, color: pet.body },
+        { id: "lArm", name: "左手", kind: "strip", len: 3, parent: "body", at: [xl - C0, 7 - C0], rest: 140, layer: 1, color: pet.accent },
+        { id: "rArm", name: "右手", kind: "strip", len: 3, parent: "body", at: [G - 1 - xl - C0, 7 - C0], rest: 40, layer: 1, color: pet.accent },
+      ],
+      anims: [
+        { id: "wave", name: "挥手", f: (t) => { const up = Math.min(1, t / 0.4); return { rArm: up * (-110 + 30 * Math.sin(t * 7)) }; } },
+        { id: "cheer", name: "欢呼", f: (t) => { const s = (1 - Math.cos(t * Math.PI * 2)) / 2; return { lArm: 90 * s, rArm: -90 * s, _dy: -0.6 * s }; } },
+      ],
+    };
+  }
 
   const TEMPLATES = {
     person: {
@@ -117,8 +142,10 @@
     },
   };
 
+  if (pet) TEMPLATES.pal = palTemplate();
+
   // ---- 状态 ----
-  let tplId = "person", tpl = TEMPLATES[tplId];
+  let tplId = pet ? "pal" : "person", tpl = TEMPLATES[tplId];
   let pieces = [], pose = {}, root = { x: 0, y: 0 };
   let selected = null, look = "normal", anim = null, animT0 = 0;
   const history = [];
@@ -140,13 +167,15 @@
   }
   const byId = (id) => pieces.find((p) => p.id === id);
   const snapshot = () => JSON.stringify({ tpl: tplId, mods: Object.fromEntries(pieces.map((p) => [p.id, { len: p.len, color: p.color, layer: p.layer }])), pose, root });
-  function pushHistory() { history.push(snapshot()); if (history.length > 80) history.shift(); }
-  function undo() {
-    const s = history.pop(); if (!s) return;
+  const future = [];
+  function pushHistory() { history.push(snapshot()); if (history.length > 80) history.shift(); future.length = 0; }
+  function apply(s) {
     const o = JSON.parse(s);
     if (o.tpl !== tplId) loadTemplate(o.tpl, o); else { for (const p of pieces) Object.assign(p, o.mods[p.id] || {}); pose = o.pose; root = o.root; }
     refresh();
   }
+  function undo() { const s = history.pop(); if (!s) return; future.push(snapshot()); apply(s); }
+  function redo() { const s = future.pop(); if (!s) return; history.push(snapshot()); apply(s); }
   const save = () => storage.set("mb.demo.puppet", JSON.parse(snapshot()));
 
   // ---- 解算:每个零件的世界位置和朝向 ----
@@ -234,7 +263,7 @@
       for (const c of cellsOf(p)) {
         const [x, y] = cellWorld(f, c), [sx, sy] = toScreen(x + ox, y + oy);
         const mark = p.marks && p.marks[c.join(",")];
-        const col = mark ? MARK_COLORS[mark] : p.color;
+        const col = mark ? markColor(mark) : p.color;
         ctx.fillStyle = col;
         ctx.beginPath(); ctx.arc(sx, sy, r, 0, Math.PI * 2); ctx.fill();
         ctx.lineWidth = isBad || isSel ? Math.max(2, s * 0.09) : Math.max(1, s * 0.04);
@@ -287,7 +316,6 @@
     $("#statusInfo").textContent = lastResult.issues.length
       ? `⚠ ${lastResult.issues.length} 个问题:${lastResult.issues[0].text}`
       : `${tpl.name} · ${n} 个零件 · ${beads} 颗豆 · ${joints} 个关节 · ${layers} 层`;
-    if (flags.layerChanged && !lastResult.issues.some((i) => i.kind === "joint") && !lastResult.issues.length) quest.done("fix");
   }
 
   // ---- 拖动:四肢绕孔转,身体整个移动 ----
@@ -309,7 +337,7 @@
     const rect = cv.getBoundingClientRect(), px = e.clientX - rect.left, py = e.clientY - rect.top;
     const h = hit(px, py);
     if (!h) { selected = null; refresh(); return; }
-    e.preventDefault(); cv.setPointerCapture(e.pointerId); cv.classList.add("dragging");
+    e.preventDefault(); try { cv.setPointerCapture(e.pointerId); } catch { /* 合成事件没有真指针 */ } cv.classList.add("dragging");
     const f = h.frames[h.p.id], [ox, oy] = layerOffset(h.p.layer), [pvx, pvy] = toScreen(f.x + ox, f.y + oy);
     drag = { id: h.p.id, root: !h.p.parent, px, py, pvx, pvy, start: Math.atan2(py - pvy, px - pvx), pose0: pose[h.p.id] || 0, root0: { ...root }, moved: false, snap: snapshot() };
   });
@@ -331,7 +359,7 @@
   const endDrag = () => {
     if (!drag) return;
     cv.classList.remove("dragging");
-    if (drag.moved) { history.push(drag.snap); } else { selected = drag.id; }
+    if (drag.moved) { history.push(drag.snap); future.length = 0; } else { selected = drag.id; }
     drag = null;
     refresh();
   };
@@ -418,7 +446,14 @@
   $("#layerFront").addEventListener("click", () => changeLayer(1));
   $("#resetPose").addEventListener("click", () => { pushHistory(); pose = {}; root = { ...tpl.root }; stopAnim(); refresh(); });
   $("#undo").addEventListener("click", undo);
-  document.addEventListener("keydown", (e) => { if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === "z") { e.preventDefault(); undo(); } });
+  $("#redo").addEventListener("click", redo);
+  document.addEventListener("keydown", (e) => {
+    if (!(e.ctrlKey || e.metaKey)) return;
+    const k = e.key.toLowerCase();
+    if (k === "z" && !e.shiftKey) { e.preventDefault(); undo(); }
+    else if ((k === "z" && e.shiftKey) || k === "y") { e.preventDefault(); redo(); }
+  });
+  if (pet) $("#tplPal").hidden = false;
   document.querySelectorAll("#templates [data-tpl]").forEach((b) => b.addEventListener("click", () => {
     if (b.dataset.tpl === tplId) return;
     pushHistory(); loadTemplate(b.dataset.tpl); refresh(); pickProblem();
@@ -426,6 +461,7 @@
   function setLook(v) {
     look = v;
     document.querySelectorAll("[data-look]").forEach((x) => x.setAttribute("aria-selected", String(x.dataset.look === v)));
+    if (v === "layers") quest.done("layers");
   }
   document.querySelectorAll("[data-look]").forEach((b) => b.addEventListener("click", () => { setLook(b.dataset.look); refresh(); }));
   // 一进来有标红的问题,就先替他选中那根豆条,右边直接出现「往后一层 / 往前一层」
@@ -448,7 +484,7 @@
     const order = pieces.map((p, i) => ({ p, i })).sort((a, b) => a.p.layer - b.p.layer || a.i - b.i);
     for (const { p } of order) for (const c of cellsOf(p)) {
       const [x, y] = cellWorld(fr[p.id], c), sx = ox + x * s, sy = oy + y * s;
-      const mark = p.marks && p.marks[c.join(",")], col = mark ? MARK_COLORS[mark] : p.color;
+      const mark = p.marks && p.marks[c.join(",")], col = mark ? markColor(mark) : p.color;
       g.fillStyle = "rgba(0,0,0,.18)"; g.beginPath(); g.arc(sx + 2, sy + 3, s * 0.46, 0, Math.PI * 2); g.fill();
       g.fillStyle = col; g.beginPath(); g.arc(sx, sy, s * 0.46, 0, Math.PI * 2); g.fill();
       g.fillStyle = isLight(col) ? "rgba(0,0,0,.2)" : "rgba(255,255,255,.25)"; g.beginPath(); g.arc(sx, sy, s * 0.16, 0, Math.PI * 2); g.fill();
@@ -481,20 +517,26 @@
     });
   });
 
-  // ---- 本关任务 ----
+  // ---- 本关任务(步骤卡片、按步骤出现的工具在 quest.js,四关共用) ----
   const quest = MBQuest.init({
     level: "puppet",
     tasks: [
-      { id: "fix", label: "把标红的豆条换到另一层(选中它,点「往后一层」)" },
-      { id: "color", label: "点一根豆条,换个颜色或长短" },
-      { id: "pose", label: "拖动四肢,摆个姿势" },
-      { id: "play", label: "让它动起来" },
+      { id: "pose", label: pet ? `拖动${petName}的手臂,摆个姿势` : "拖动四肢,摆个姿势", act: "拖动零件",
+        tip: pet ? `${petName}两侧的豆条就是手臂,豆子上的孔是关节。按住一只手臂拖动,它会绕着孔转。` : "豆条上的孔就是关节。按住一只手或脚拖动,它会绕着孔转。" },
+      { id: "play", label: "让它动起来", act: "播放动作",
+        tip: "点右边「动起来」里的一个动作,比如「挥手」。再点一下停下。" },
+      { id: "color", label: "点一根豆条,换个颜色或长短", act: "点一下选中",
+        tip: "点一下一只手臂选中它,在右边换个颜色,或者点「长一颗」。" },
+      { id: "layers", label: "切到「分层看」", act: "切换视角",
+        tip: "实物是一层层叠起来的:手臂叠在身体前面,销子穿过两层的孔。点右上角的「分层看」,看看每根在第几层。" },
     ],
   });
 
   window.addEventListener("resize", () => { fit(); refresh(); });
-  const saved = storage.get("mb.demo.puppet");
-  loadTemplate(saved && TEMPLATES[saved.tpl] ? saved.tpl : "person", saved);
+  // 有伙伴、这关还没过:默认就是伙伴(以前没领养时存下的别的模板不算数)
+  const savedRaw = storage.get("mb.demo.puppet");
+  const saved = pet && !quest.passedBefore && savedRaw?.tpl !== "pal" ? null : savedRaw;
+  loadTemplate(saved && TEMPLATES[saved.tpl] ? saved.tpl : tplId, saved);
   refresh();
   pickProblem();
 })();

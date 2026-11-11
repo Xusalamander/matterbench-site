@@ -63,14 +63,24 @@
   const light = Object.assign({ on: false, fx: "solid", color: "#FFB65C", bright: 70, speed: 4 }, saved?.light || {}, { on: false });
   const ui = { view: "2d", showGrid: true };
 
-  // ---- 本关任务 ----
+  // ---- 伙伴:灯罩的默认图案就是它 ----
+  const myCard = storage.get("mb.card");
+  const pet = window.MBCard && myCard && Number.isInteger(myCard.seed) ? MBCard.makeCard(myCard.seed) : null;
+  const petName = pet ? pet.name : "伙伴";
+
+  // ---- 本关任务(步骤卡片、按步骤出现的工具在 quest.js,四关共用) ----
   const quest = MBQuest.init({
     level: "lamp",
     tasks: [
-      { id: "template", label: "挑一个灯罩模板" },
-      { id: "lightOn", label: "开灯看看效果" },
-      { id: "view3d", label: "切到 3D 灯罩转一圈" },
-      { id: "code", label: "下载 ESP32 代码" },
+      { id: "template", label: pet ? `把${petName}拼到灯罩上` : "挑一个灯罩图案", act: "选模板",
+        tip: pet ? `灯罩有四面,每面 16×16 颗豆。点右边的「我的伙伴」,四面一下就拼好了;也可以在展开图上直接点着画。`
+          : "灯罩有四面,每面 16×16 颗豆。点右边一个模板,四面一下就拼好了。(领养伙伴后,可以把它拼上去)" },
+      { id: "lightOn", label: "开灯", act: "开灯",
+        tip: `灯罩里面是 4 块 RGB 灯板。点画面右上角的「开灯」,看光从拼豆里透出来${pet ? `——${petName}亮起来了` : ""}。` },
+      { id: "view3d", label: "切到 3D 灯罩转一圈", act: "切换视角 · 拖动转",
+        tip: "点右上角的「3D 灯罩」,按住画面拖动转一圈。第 4 关转视角也是这个动作。" },
+      { id: "code", label: "下载 ESP32 代码", act: "下载",
+        tip: "点右边的「下载 ESP32 代码」,烧进灯里就能亮成刚才的样子;旁边的「下载图纸」照着拼。" },
     ],
   });
 
@@ -204,14 +214,6 @@
 
   $("#collapse").addEventListener("click", () => { $("#app").classList.toggle("side-off"); requestAnimationFrame(refreshView); });
 
-  const welcome = $("#welcome");
-  const closeWelcome = () => { welcome.hidden = true; storage.set("mb.demo.welcomed", 1); };
-  $("#welcomeClose").addEventListener("click", closeWelcome);
-  $("#welcomeGo").addEventListener("click", closeWelcome);
-  welcome.addEventListener("click", (e) => { if (e.target === welcome) closeWelcome(); });
-  document.addEventListener("keydown", (e) => { if (e.key === "Escape" && !welcome.hidden) closeWelcome(); });
-  $("#helpBtn").addEventListener("click", () => { welcome.hidden = false; });
-  $("#aboutBtn").addEventListener("click", () => { welcome.hidden = false; });
 
   $("#optGrid").addEventListener("change", (e) => { ui.showGrid = e.target.checked; push3d(); refreshView(); });
 
@@ -446,6 +448,13 @@
   // ---- 模板 ----
   function rnd(seed) { let s = seed; return () => (s = (Math.imul(s, 1664525) + 1013904223) >>> 0) / 4294967296; }
   const TEMPLATES = {
+    // 你的伙伴:前后两面是它,左右两面撒几颗它身上的颜色;底色用透光好的米白
+    pal() {
+      const bg = "#F6E7DA", c = new Array(CELLS).fill(bg), o = (N - pet.cells.length) >> 1, r = rnd(pet.seed);
+      for (const f of [0, 2]) pet.cells.forEach((row, y) => row.forEach((v, x) => { if (v) c[f * N * N + (y + o) * N + x + o] = v; }));
+      for (const f of [1, 3]) for (let k = 0; k < 14; k++) c[f * N * N + ((r() * N) | 0) * N + ((r() * N) | 0)] = k % 3 ? pet.body : pet.accent;
+      return [c, [bg, ...new Set(pet.cells.flat().filter(Boolean))]];
+    },
     stars() {
       const bg = "#1B2A4A", star = "#F5D547", white = "#FFFFFF", moon = "#F6E7DA";
       const c = new Array(CELLS).fill(bg), r = rnd(7);
@@ -502,7 +511,8 @@
       return [c, [wood, dark, glass, frame, roof]];
     },
   };
-  document.querySelectorAll("#templates [data-tpl]").forEach((b) => b.addEventListener("click", () => {
+  document.querySelectorAll("[data-tpl]").forEach((b) => b.addEventListener("click", () => {
+    if (b.dataset.tpl === "pal" && !pet) return;
     quest.done("template");
     const [cells, cols] = TEMPLATES[b.dataset.tpl]();
     work.cells = cells;
@@ -758,9 +768,13 @@ void loop() {
   let resizeRaf = 0;
   window.addEventListener("resize", () => { cancelAnimationFrame(resizeRaf); resizeRaf = requestAnimationFrame(refreshView); });
 
-  // ---- 启动:第一次来给一个星空灯罩 ----
+  // ---- 启动:第一次来给四面米白的空灯罩(有伙伴就等他把伙伴拼上去),没有伙伴给一个星空 ----
+  if (pet) {
+    $('#templates [data-tpl="pal"]').hidden = false;
+    const ic = $("#tplPal"); ic.style.background = pet.body; ic.style.boxShadow = `inset 0 0 0 6px #F6E7DA, inset 0 0 0 9px ${pet.accent}`;
+  }
   if (!saved) {
-    const [cells, cols] = TEMPLATES.stars();
+    const [cells, cols] = pet ? [new Array(CELLS).fill("#F6E7DA"), ["#F6E7DA"]] : TEMPLATES.stars();
     work.cells = cells;
     cols.forEach((c) => { if (!work.palette.includes(c)) work.palette.push(c); });
     hist.prev = snap();
@@ -770,5 +784,4 @@ void loop() {
   syncLightUI();
   update();
   setView("2d");
-  if (!storage.get("mb.demo.welcomed")) welcome.hidden = false;
 })();

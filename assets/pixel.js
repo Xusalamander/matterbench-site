@@ -1,4 +1,5 @@
-// 第 1 关:拼豆像素画。16×16 板子,照着淡淡的图案拼。只有画 / 擦 / 撤销。
+// 第 1 关:拼豆像素画。16×16 板子,照着淡淡的图案拼;默认图案就是你伙伴卡片上的样子,拼完它就「拼出了身体」。
+// 步骤卡片、按步骤出现的工具在 quest.js(四关共用)。
 (() => {
   "use strict";
   const N = 16;
@@ -18,7 +19,12 @@
     : isLight(c) ? "rgba(0,0,0,.18)" : "rgba(255,255,255,.18)");
 
   const C = { X: "#16181D", W: "#FFFFFF", F: "#F6E7DA", R: "#E5484D", Y: "#F5D547" };
-  const PALETTE = ["#16181D", "#FFFFFF", "#F6E7DA", "#E5484D", "#F28B2E", "#F5D547", "#C6F04A", "#3DB86B", "#1F8FA6", "#3E63DD", "#8E4EC6", "#F2A7C3"];
+  // 你的伙伴:卡片上 14×14 的图案,放在 16×16 板子正中
+  const myCard = storage.get("mb.card");
+  const pet = window.MBCard && myCard && Number.isInteger(myCard.seed) ? MBCard.makeCard(myCard.seed) : null;
+  const petName = pet ? pet.name : "伙伴";
+  const PET_COLORS = pet ? [...new Set(pet.cells.flat().filter(Boolean))] : [];
+  const PALETTE = [...new Set(["#16181D", "#FFFFFF", "#F6E7DA", "#E5484D", "#F28B2E", "#F5D547", "#C6F04A", "#3DB86B", "#1F8FA6", "#3E63DD", "#8E4EC6", "#F2A7C3", ...PET_COLORS])];
   const GUIDES = {
     heart: [
       "................", "................", "...XXX....XXX...", "..XRRRX..XRRRX..",
@@ -40,6 +46,11 @@
     ],
   };
   const guideCells = (name) => {
+    if (name === "pal" && pet) {
+      const out = new Array(N * N).fill(null), o = (N - pet.cells.length) >> 1;
+      pet.cells.forEach((row, y) => row.forEach((c, x) => { out[(y + o) * N + x + o] = c || null; }));
+      return out;
+    }
     const g = GUIDES[name];
     if (!g) return new Array(N * N).fill(null);
     const out = [];
@@ -48,24 +59,30 @@
   };
 
   // ---- 状态 ----
-  const saved = storage.get("mb.demo.pixel");
+  // 有伙伴、这关还没过:默认就拼伙伴(以前没领养时存下的别的图案不算数)
+  const savedRaw = storage.get("mb.demo.pixel");
+  const saved = pet && !MBQuest.levels().pixel && savedRaw?.guide !== "pal" ? null : savedRaw;
   const st = {
-    guide: saved?.guide && (GUIDES[saved.guide] || saved.guide === "none") ? saved.guide : "heart",
+    guide: saved?.guide && (GUIDES[saved.guide] || saved.guide === "none" || (saved.guide === "pal" && pet)) ? saved.guide : pet ? "pal" : "heart",
     cells: Array.isArray(saved?.cells) && saved.cells.length === N * N ? saved.cells : new Array(N * N).fill(null),
-    color: "#E5484D",
+    color: pet ? pet.body : "#E5484D",
     erase: false,
   };
   let guide = guideCells(st.guide);
-  const history = [];
-  const pushHistory = () => { history.push(st.cells.slice()); if (history.length > 80) history.shift(); };
+  const history = [], future = [];
+  const pushHistory = () => { history.push(st.cells.slice()); if (history.length > 80) history.shift(); future.length = 0; };
 
   const quest = MBQuest.init({
     level: "pixel",
     tasks: [
-      { id: "first", label: "放下第一颗豆" },
-      { id: "colors", label: "用上 3 种颜色" },
-      { id: "finish", label: `拼完一个图案(照着拼,或自由画满 ${FREE_GOAL} 颗)` },
-      { id: "save", label: "下载你的图案" },
+      { id: "first", label: "放下第一颗豆", act: "点一下放",
+        tip: pet ? `板子上淡淡的颜色就是${petName}的样子。点一下淡色的位置,放下第一颗豆。` : "板子上淡淡的颜色就是要拼的图案。点一下淡色的位置,放下第一颗豆。(领养伙伴后,这里会是它的样子)" },
+      { id: "colors", label: "用上 3 种颜色", act: "选颜色",
+        tip: "图案不止一种颜色。在右边「颜色」里换一种,点到同色的淡色位置上;放错的豆右上角会有个小红点。" },
+      { id: "finish", label: pet ? `照着拼完${petName}` : "照着拼完一个图案", title: pet ? `拼出${petName}的身体` : "拼完整个图案", act: "按住拖动 · 撤销",
+        tip: "按住鼠标拖过去能连着放;放错了点上面的撤销。拼对九成就算完成。" },
+      { id: "save", label: "下载你的图案", act: "下载",
+        tip: "点右边的「下载我的图案」。这就是一张能照着拼实物的图纸。" },
     ],
   });
 
@@ -153,10 +170,15 @@
   }
   $("#modeDraw").addEventListener("click", () => setErase(false));
   $("#modeErase").addEventListener("click", () => setErase(true));
-  function undo() { const h = history.pop(); if (h) { st.cells = h; update(); } }
+  function undo() { const h = history.pop(); if (h) { future.push(st.cells.slice()); st.cells = h; update(); } }
+  function redo() { const h = future.pop(); if (h) { history.push(st.cells.slice()); st.cells = h; update(); } }
   $("#undo").addEventListener("click", undo);
+  $("#redo").addEventListener("click", redo);
   document.addEventListener("keydown", (e) => {
-    if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === "z") { e.preventDefault(); undo(); }
+    if (!(e.ctrlKey || e.metaKey)) return;
+    const k = e.key.toLowerCase();
+    if (k === "z" && !e.shiftKey) { e.preventDefault(); undo(); }
+    else if ((k === "z" && e.shiftKey) || k === "y") { e.preventDefault(); redo(); }
   });
   document.querySelectorAll("#guides [data-guide]").forEach((b) => b.addEventListener("click", () => {
     if (b.dataset.guide === st.guide) return;
@@ -198,16 +220,20 @@
     $("#sumColors").textContent = used.size;
     const target = guide.filter(Boolean).length;
     const right = guide.reduce((n, g, i) => n + (g && st.cells[i] === g ? 1 : 0), 0);
-    $("#statusInfo").textContent = target
+    const progText = target
       ? `照着拼:已对 ${right} / ${target} 颗` + (right >= target ? " · 完成!" : "")
       : `自由画 · ${parts} 颗 · ${used.size} 种颜色` + (parts >= FREE_GOAL ? " · 完成!" : ` · 再放 ${FREE_GOAL - parts} 颗就算拼完`);
+    $("#statusInfo").textContent = progText;
+    $("#undo").disabled = !history.length; $("#redo").disabled = !future.length;
     if (parts) quest.done("first");
     if (used.size >= 3) quest.done("colors");
     if (target ? right / target >= 0.9 : parts >= FREE_GOAL) quest.done("finish");
+    quest.prog(quest.current() === 2 ? progText : quest.current() === 1 ? `已经用了 ${used.size} / 3 种颜色` : "");
     storage.set("mb.demo.pixel", { guide: st.guide, cells: st.cells });
   }
 
   document.querySelectorAll("#guides [data-guide]").forEach((x) => x.setAttribute("aria-pressed", String(x.dataset.guide === st.guide)));
+  if (!pet) $('#guides [data-guide="pal"]').hidden = true;
   window.addEventListener("resize", () => { size(); draw(); });
   renderPalette();
   size();

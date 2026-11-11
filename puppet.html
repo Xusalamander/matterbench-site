@@ -4,12 +4,14 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>第 3 关 · 会动的豆条小人 · MatterBench 在线体验</title>
-  <meta name="description" content="用豆条拼一个会动的小人:豆子上的孔就是关节,分层叠起来,拖动摆姿势,再让它动起来。">
+  <meta name="description" content="给你的拼豆伙伴装上豆条手臂:豆子上的孔就是关节,拖动摆姿势,再让它挥手。">
   <link rel="icon" href="assets/logo.svg" type="image/svg+xml">
   <link rel="stylesheet" href="assets/demo.css">
   <script>
     try { const t = localStorage.getItem("mb.demo.theme"); if (t) document.documentElement.dataset.theme = t; } catch (e) {}
   </script>
+  <script src="config.js"></script>
+  <script src="assets/cardgen.js" defer></script>
   <script src="assets/quest.js" defer></script>
   <script src="assets/puppet.js" defer></script>
 </head>
@@ -22,6 +24,7 @@
     </a>
     <div class="bar-mid">
       <button class="icon" id="undo" title="撤销 (Ctrl+Z)" aria-label="撤销"><svg viewBox="0 0 24 24"><path d="M9 14 4 9l5-5"/><path d="M4 9h10a6 6 0 0 1 0 12h-3"/></svg></button>
+      <button class="icon" id="redo" title="重做 (Ctrl+Shift+Z)" aria-label="重做"><svg viewBox="0 0 24 24"><path d="m15 14 5-5-5-5"/><path d="M20 9H10a6 6 0 0 0 0 12h3"/></svg></button>
     </div>
     <div class="bar-right">
       <a class="txt txt-go" href="demo.html">← 我的伙伴</a>
@@ -30,7 +33,8 @@
 
   <div class="app" id="app">
     <main class="view" id="view">
-      <div class="view-tabs" role="tablist" aria-label="看法">
+      <div class="stage-card" id="stepCard"></div>
+      <div class="view-tabs" role="tablist" aria-label="看法" data-step="4">
         <button data-look="normal" aria-selected="true">正常看</button>
         <button data-look="layers" aria-selected="false">分层看</button>
       </div>
@@ -41,22 +45,13 @@
     <aside class="side" id="side">
       <section class="grp quest" id="quest"></section>
 
-      <section class="grp">
-        <h4>模板</h4>
-        <div class="chips-s" id="templates">
-          <button data-tpl="person" aria-pressed="true">小人</button>
-          <button data-tpl="dog" aria-pressed="false">小狗</button>
-          <button data-tpl="arm" aria-pressed="false">机械臂</button>
-        </div>
-      </section>
-
-      <section class="grp">
+      <section class="grp" data-step="2">
         <h4>动起来</h4>
         <div class="chips-s" id="anims"></div>
         <button class="btn-sub" id="resetPose" style="margin-top:8px">摆回原样</button>
       </section>
 
-      <section class="grp" id="editor">
+      <section class="grp" id="editor" data-step="3">
         <h4>选中的豆条 <span class="tip" title="点画面里的一根豆条来选中它。">i</span></h4>
         <p class="sel-empty" id="selEmpty">点画面里的一根豆条。</p>
         <div id="selBox" hidden>
@@ -66,7 +61,7 @@
             <button class="btn-sub" id="lenMinus">短一颗</button>
             <button class="btn-sub" id="lenPlus">长一颗</button>
           </div>
-          <div class="layer-row">
+          <div class="layer-row" data-step="4">
             <button class="btn-sub" id="layerBack">往后一层</button>
             <span class="layer-tag" id="selLayer">—</span>
             <button class="btn-sub" id="layerFront">往前一层</button>
@@ -75,7 +70,7 @@
         </div>
       </section>
 
-      <section class="grp">
+      <section class="grp" data-step="4">
         <h4>分层</h4>
         <p class="fine" style="text-align:left">实物是一层一层叠起来的:关节是一根销子,穿过两根豆条的孔。所以连在一起的两根要一前一后,不能在同一层。</p>
         <div class="layer-demo" aria-hidden="true">
@@ -93,11 +88,22 @@
         <ul class="checks-s" id="checks"></ul>
       </section>
 
+      <details class="more-box" id="moreBox">
+        <summary>更多</summary>
+      <section class="grp">
+        <h4>模板</h4>
+        <div class="chips-s" id="templates">
+          <button data-tpl="pal" aria-pressed="false" id="tplPal" hidden>我的伙伴</button>
+          <button data-tpl="person" aria-pressed="true">小人</button>
+          <button data-tpl="dog" aria-pressed="false">小狗</button>
+          <button data-tpl="arm" aria-pressed="false">机械臂</button>
+        </div>
+      </section>
       <section class="grp">
         <h4>带走</h4>
         <button class="btn-sub" id="dlPng">下载拼装图</button>
       </section>
-
+      </details>
 
       <nav class="side-foot">
         <a href="demo.html">← 回到我的伙伴</a>

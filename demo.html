@@ -4,7 +4,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>在线体验 · 领养你的拼豆伙伴 · MatterBench</title>
-  <meta name="description" content="抽一只随机的拼豆小伙伴,带它闯三关:拼出身体、学会发光、学会动。闯得越多,能领的小奖品越好。全部在浏览器里运行。">
+  <meta name="description" content="抽一只随机的拼豆小伙伴,带它闯四关:拼出身体、学会发光、学会动、搭出立体骨架。闯得越多,能领的小奖品越好。全部在浏览器里运行。">
   <link rel="icon" href="assets/logo.svg" type="image/svg+xml">
   <link rel="stylesheet" href="assets/demo.css">
   <script src="config.js"></script>
@@ -41,7 +41,7 @@
           <div id="adopt">
             <span class="step-tag">第 1 步</span>
             <h1>领养你的拼豆伙伴</h1>
-            <p class="lead">抽一只随机的拼豆小伙伴,再带它闯三关:拼出身体、学会发光、学会动。闯得越多,能领的小奖品越好。</p>
+            <p class="lead">抽一只随机的拼豆小伙伴,再带它闯四关:拼出身体、学会发光、学会动、搭出立体骨架。闯得越多,能领的小奖品越好。</p>
             <label class="nick">
               <span>给它的主人起个名字,印在卡上(可不填)</span>
               <input id="nick" maxlength="8" placeholder="比如:小豆" autocomplete="off">
@@ -92,7 +92,7 @@
             <div class="stars">★<span>★★</span></div>
             <b>第 1 关 · 拼豆像素画</b>
             <span class="level-skill">解锁 🧩 拼出身体</span>
-            <p>选颜色,在格子上点一点,拼出一个小图案。只有画、擦、撤销三个按钮。</p>
+            <p>照着淡淡的图案,一颗颗把你的伙伴拼出来。学会:点一下放、选颜色、撤销。</p>
             <span class="level-go">开始 →</span>
           </div>
         </a>
@@ -112,7 +112,7 @@
             <div class="stars">★★<span>★</span></div>
             <b>第 2 关 · 发光拼豆灯罩</b>
             <span class="level-skill">解锁 💡 发光</span>
-            <p>给灯罩四面拼图案,里面的 ESP32 灯板选个灯效,开灯看光透出来,还能带走代码。</p>
+            <p>把伙伴拼到灯罩上,开灯让它发光,再切到 3D 转一圈。新学:开灯、切换视角。</p>
             <span class="level-go">开始 →</span>
           </div>
         </a>
@@ -128,7 +128,28 @@
             <div class="stars">★★★</div>
             <b>第 3 关 · 会动的豆条小人</b>
             <span class="level-skill">解锁 🦾 可动</span>
-            <p>用豆条拼一个小人,豆子上的孔就是关节。拖动四肢摆姿势,再让它走起来。</p>
+            <p>给伙伴装上豆条手臂,豆子上的孔就是关节。拖动摆姿势,再让它挥手。新学:拖动零件。</p>
+            <span class="level-go">开始 →</span>
+          </div>
+        </a>
+
+        <a class="level" href="build.html" data-level="build">
+          <div class="level-pic" aria-hidden="true">
+            <svg viewBox="0 0 320 200">
+              <rect width="320" height="200" fill="#16181D"/>
+              <path d="M60 160 L160 190 L260 160 L160 130 Z" fill="#3B4642"/>
+              <g fill="#3FBFAE"><rect x="104" y="70" width="10" height="80" rx="5"/><rect x="206" y="70" width="10" height="80" rx="5"/><rect x="155" y="88" width="10" height="82" rx="5"/></g>
+              <path d="M96 70 L224 70 L224 80 L96 80 Z" fill="#E8935A"/>
+              <g fill="#16181D" opacity=".45"><circle cx="109" cy="75" r="3"/><circle cx="135" cy="75" r="3"/><circle cx="160" cy="75" r="3"/><circle cx="185" cy="75" r="3"/><circle cx="211" cy="75" r="3"/></g>
+              <rect x="206" y="52" width="70" height="10" rx="5" fill="#9A90EA" transform="rotate(-18 211 57)"/>
+              <g><circle cx="70" cy="150" r="7" fill="#E5484D"/><circle cx="70" cy="136" r="7" fill="#F5D547"/><circle cx="70" cy="122" r="7" fill="#3E63DD"/><circle cx="70" cy="108" r="7" fill="#3DB86B"/></g>
+            </svg>
+          </div>
+          <div class="level-body">
+            <div class="stars">★★<span>★</span></div>
+            <b>第 4 关 · 立体搭建</b>
+            <span class="level-skill">解锁 🧱 搭骨架</span>
+            <p>跟着发光的位置,给伙伴搭一副能站、能转的骨架,最后它自己站上去。新学:换零件。</p>
             <span class="level-go">开始 →</span>
           </div>
         </a>

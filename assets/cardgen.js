@@ -55,11 +55,12 @@
     "最爱帮朋友找缺的那一颗", "一颗豆也不浪费", "能从一堆豆里闻出新颜色", "睡觉时会排成一条豆条",
   ];
 
-  // 伙伴的技能:前三个对应在线体验的三关,通关就在卡上点亮;声音还没有关卡,只是预告
+  // 伙伴的技能:前四个对应在线体验的四关,通关就在卡上点亮;声音还没有关卡,只是预告
   const POWERS = [
     { key: "body", icon: "🧩", name: "拼出身体", level: "pixel", href: "pixel.html", how: "第 1 关 · 拼豆像素画" },
     { key: "light", icon: "💡", name: "发光", level: "lamp", href: "lamp.html", how: "第 2 关 · 发光灯罩" },
     { key: "move", icon: "🦾", name: "可动", level: "puppet", href: "puppet.html", how: "第 3 关 · 会动的豆条小人" },
+    { key: "build", icon: "🧱", name: "搭骨架", level: "build", href: "build.html", how: "第 4 关 · 立体搭建" },
     { key: "sound", icon: "🔊", name: "声音", level: null, href: null, how: "还在路上,原型开放时第一批解锁" },
   ];
   const DREAM = {
@@ -176,6 +177,13 @@
         g.lineTo(x, y + s); g.lineTo(x - s * 0.3, y + s * 0.3); g.lineTo(x - s, y); g.lineTo(x - s * 0.3, y - s * 0.3); g.fill();
       }
     }
+    if (fx.build) { // 搭骨架:身后立着两根圆棒,脚下一根带孔的扁条(和第 4 关一样的零件)
+      g.fillStyle = "#3FBFAE";
+      for (const x of [ax + 52, ax + aw - 52]) { rr(g, x - 4, ay + 24, 8, ah - 44, 4); g.fill(); }
+      g.fillStyle = "#E8935A"; rr(g, ax + 20, ay + ah - 24, aw - 40, 13, 4); g.fill();
+      g.fillStyle = "rgba(0,0,0,.45)";
+      for (let x = ax + 32; x <= ax + aw - 28; x += 16) { g.beginPath(); g.arc(x, ay + ah - 17.5, 3, 0, Math.PI * 2); g.fill(); }
+    }
     const cell = 18, ox = 180 - (G * cell) / 2, oy = ay + (ah - G * cell) / 2;
     const list = [];
     for (let y = 0; y < G; y++) for (let x = 0; x < G; x++) if (c.cells[y][x]) list.push([y, x, c.cells[y][x]]);
@@ -245,8 +253,8 @@
   }
 
 
-  // ---- 领奖码:卡号后面加一位「过了哪几关」(三位的掩码)和一位校验 ----
-  const LEVELS = ["pixel", "lamp", "puppet"];
+  // ---- 领奖码:卡号后面加一位「过了哪几关」(每关一位的掩码)和一位校验 ----
+  const LEVELS = ["pixel", "lamp", "puppet", "build"];
   const maskOf = (passed) => LEVELS.reduce((m, k, i) => m | (passed[k] ? 1 << i : 0), 0);
   const check2 = (seed, mask) => hash32((seed ^ Math.imul(mask + 1, 0x9e3779b1)) >>> 0) & 31;
   const claimCode = (seed, passed) => { const m = maskOf(passed); return encode(seed) + "-" + ABC[m] + ABC[check2(seed, m)]; };
@@ -255,7 +263,7 @@
     if (s.length === 8) { const seed = decode(s); return seed === null ? null : { seed, passed: null }; }
     if (s.length !== 10) return null;
     const seed = decode(s.slice(0, 8)), m = ABC.indexOf(s[8]);
-    if (seed === null || m < 0 || m > 7 || ABC.indexOf(s[9]) !== check2(seed, m)) return null;
+    if (seed === null || m < 0 || m >= 1 << LEVELS.length || ABC.indexOf(s[9]) !== check2(seed, m)) return null;
     return { seed, passed: Object.fromEntries(LEVELS.map((k, i) => [k, !!(m & (1 << i))])) };
   }
   // 奖品:抽到的档位起步,每过一关升一档,最多升 cardMaxUpgrade 档,封顶最高档
@@ -264,7 +272,7 @@
     const i = Math.min(TIERS.length - 1, TIERS.indexOf(card.tier) + up);
     return { tier: TIERS[i], up, room: Math.min(TIERS.length - 1 - TIERS.indexOf(card.tier), cfg.cardMaxUpgrade ?? 2) - up };
   }
-  const fxOf = (passed) => ({ body: !!passed.pixel, light: !!passed.lamp, move: !!passed.puppet });
+  const fxOf = (passed) => ({ body: !!passed.pixel, light: !!passed.lamp, move: !!passed.puppet, build: !!passed.build });
 
   window.MBCard = { TIERS, LOOK, POWERS, LEVELS, BODY, makeCard, drawCard, drawBack, encode, claimCode, decodeAny, prizeFor, fxOf };
 })();

@@ -1,0 +1,134 @@
+<!doctype html>
+<html lang="zh-CN" data-theme="dark">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>第 4 关 · 立体搭建 · MatterBench 在线体验</title>
+  <meta name="description" content="跟着发光的位置,叠拼豆、立圆棒、搭扁条、装卡扣,给你的拼豆伙伴搭一副能站、能挥手的骨架。">
+  <link rel="icon" href="assets/logo.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="assets/demo.css">
+  <script>
+    try { const t = localStorage.getItem("mb.demo.theme"); if (t) document.documentElement.dataset.theme = t; } catch (e) {}
+  </script>
+  <script src="config.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js" defer></script>
+  <script src="assets/cardgen.js" defer></script>
+  <script src="assets/quest.js" defer></script>
+  <script src="assets/lattice.js" defer></script>
+  <script src="assets/build.js" defer></script>
+</head>
+<body>
+  <header class="bar">
+    <a class="logo" href="demo.html" title="回到我的伙伴">
+      <img src="assets/logo.svg" alt="">
+      <b>MatterBench</b>
+      <span class="ver">第 4 关 · 立体搭建</span>
+    </a>
+    <div class="bar-mid">
+      <button class="icon" id="undo" title="撤销 (Z)" aria-label="撤销"><svg viewBox="0 0 24 24"><path d="M9 14 4 9l5-5"/><path d="M4 9h10a6 6 0 0 1 0 12h-3"/></svg></button>
+      <button class="icon" id="redo" title="重做 (Y)" aria-label="重做"><svg viewBox="0 0 24 24"><path d="m15 14 5-5-5-5"/><path d="M20 9H10a6 6 0 0 0 0 12h3"/></svg></button>
+    </div>
+    <div class="bar-right">
+      <a class="txt txt-go" href="demo.html">← 我的伙伴</a>
+    </div>
+  </header>
+
+  <div class="app" id="app">
+    <main class="view" id="view">
+      <div class="gl" id="gl"></div>
+      <div class="stage-card" id="stepCard"></div>
+      <div class="gl-chips">
+        <span class="chip" id="pos">—</span>
+        <span class="chip ok" id="fit">—</span>
+      </div>
+    </main>
+
+    <aside class="side" id="side">
+      <section class="grp quest" id="quest"></section>
+
+      <section class="grp">
+        <h4>零件</h4>
+        <div class="tools" id="tools">
+          <button type="button" data-tool="bead" aria-pressed="true"><span class="sw sw-bead"></span>拼豆</button>
+          <button type="button" data-tool="rod" aria-pressed="false"><span class="sw" style="background:var(--rod)"></span>圆棒</button>
+          <button type="button" data-tool="strip" aria-pressed="false"><span class="sw" style="background:var(--strip)"></span>扁条</button>
+          <button type="button" data-tool="clip" aria-pressed="false"><span class="sw" style="background:var(--clip)"></span>卡扣</button>
+          <button type="button" data-tool="pal" aria-pressed="false" hidden><span class="sw sw-pal"></span>伙伴</button>
+          <button type="button" data-tool="sel" aria-pressed="false" data-free><span class="sw" style="background:var(--sel)"></span>选择</button>
+          <button type="button" data-tool="del" aria-pressed="false" data-free><span class="sw" style="background:var(--bad)"></span>删除</button>
+        </div>
+        <p class="fine" style="text-align:left" id="toolNote"></p>
+      </section>
+
+      <section class="grp" id="params">
+        <h4>放置</h4>
+        <div class="swatches" id="beadColors"></div>
+        <div class="prow"><span>方向</span><button type="button" class="btn-sub" id="rot">—</button></div>
+        <div class="prow" id="row-n"><span>长度</span><div class="stepper" id="st-n"><button type="button" data-d="-1" aria-label="减小">−</button><output id="o-n"></output><button type="button" data-d="1" aria-label="增大">+</button></div></div>
+        <div class="prow" id="row-h"><span>高度</span><div class="stepper" id="st-h"><button type="button" data-d="-1" aria-label="降低">−</button><output id="o-h"></output><button type="button" data-d="1" aria-label="升高">+</button></div></div>
+        <div class="prow" id="row-s"><span>微调</span><div class="stepper" id="st-s"><button type="button" data-d="-1" aria-label="往下微调">−</button><output id="o-s"></output><button type="button" data-d="1" aria-label="往上微调">+</button></div></div>
+        <p class="fine" style="text-align:left" id="rule"></p>
+      </section>
+
+      <section class="grp" id="selSec" hidden>
+        <h4>选中的零件</h4>
+        <p class="sel-empty" id="selInfo">点一个零件选中它,按住 Shift 多选。</p>
+        <div id="selTools">
+          <div class="move" id="move">
+            <button type="button" class="btn-sub" data-m="0,-1,0">往后</button>
+            <button type="button" class="btn-sub" data-m="0,0,1">升高</button>
+            <button type="button" class="btn-sub" data-m="-1,0,0">往左</button>
+            <button type="button" class="btn-sub" data-m="1,0,0">往右</button>
+            <button type="button" class="btn-sub" data-m="0,1,0">往前</button>
+            <button type="button" class="btn-sub" data-m="0,0,-1">降低</button>
+          </div>
+          <div class="row3">
+            <button type="button" class="btn-sub" id="group">选整组</button>
+            <button type="button" class="btn-sub" id="copy">复制</button>
+            <button type="button" class="btn-sub" id="delSel">删除</button>
+          </div>
+        </div>
+      </section>
+
+      <section class="grp" id="checkSec" data-free>
+        <h4>结构检查 <span class="tip" title="穿孔:圆棒或拼豆穿过孔。贴合:两件贴在一起(拼豆叠起来、零件靠着)。悬空:没有连到底板,会掉下来。">i</span></h4>
+        <div class="stats">
+          <div><b id="nParts">0</b><span>零件</span></div>
+          <div><b id="nPins">0</b><span>穿孔</span></div>
+          <div><b id="nTouch">0</b><span>贴合</span></div>
+          <div><b id="nFloat">0</b><span>悬空</span></div>
+        </div>
+        <ul class="issues" id="issues"></ul>
+      </section>
+
+      <section class="grp" id="stepSec" data-free>
+        <h4>装配步骤</h4>
+        <div id="stepOff"><button type="button" class="btn-sub" style="width:100%" id="stepGo">一步一步看怎么装</button></div>
+        <div id="stepOn" hidden>
+          <div class="steprow"><button type="button" class="btn-sub" id="stepPrev" aria-label="上一步">‹</button><input type="range" id="stepRange" min="1" value="1" aria-label="第几步"><button type="button" class="btn-sub" id="stepNext" aria-label="下一步">›</button></div>
+          <p class="steptxt" id="stepTxt"></p>
+          <button type="button" class="btn-sub" style="width:100%" id="stepExit">回到搭建</button>
+        </div>
+      </section>
+
+      <section class="grp" id="bomSec">
+        <h4>用料</h4>
+        <table class="bom">
+          <thead><tr><th>零件</th><th class="num">长度</th><th class="num">数量</th></tr></thead>
+          <tbody id="bom"></tbody>
+        </table>
+        <button type="button" class="btn-sub" style="width:100%" id="clear">清空重来</button>
+      </section>
+
+      <nav class="side-foot">
+        <a href="demo.html">← 回到我的伙伴</a>
+      </nav>
+    </aside>
+  </div>
+
+  <footer class="status">
+    <span id="statusInfo">—</span>
+    <span class="hint">点发光的位置放零件 · 按住拖动转视角 · 滚轮缩放 · Z 撤销</span>
+  </footer>
+</body>
+</html>

@@ -6,7 +6,7 @@
   const ctx = $("#card").getContext("2d");
   const DPR = Math.min(3, window.devicePixelRatio || 1);
   $("#card").width = 360 * DPR; $("#card").height = 504 * DPR;
-  const LEVEL_NAME = { pixel: "第 1 关", lamp: "第 2 关", puppet: "第 3 关" };
+  const LEVEL_NAME = { pixel: "第 1 关", lamp: "第 2 关", puppet: "第 3 关", build: "第 4 关" };
   // 图纸上的颜色名;不在这里的(肚皮色是身体色和白色混出来的)按色值写
   const COLOR_NAME = {
     "#E5484D": "红", "#F28B2E": "橙", "#F5D547": "黄", "#C6F04A": "黄绿", "#3DB86B": "绿",
@@ -34,7 +34,7 @@
   // 拼豆图纸:14×14 格,行列编号,每格写颜色字母,下面是用料表
   function patternPng() {
     const { pet, passed } = cur, pal = palette(pet), G = pet.cells.length;
-    const cell = 48, pad = 56, legendH = 44 + pal.length * 40 + (passed.puppet ? 64 : 0);
+    const cell = 48, pad = 56, legendH = 44 + pal.length * 40 + (passed.puppet ? 64 : 0) + (passed.build ? 64 : 0);
     const W = pad * 2 + cell * G, H = 112 + cell * G + pad + legendH;
     const cv = document.createElement("canvas"); cv.width = W; cv.height = H;
     const g = cv.getContext("2d"), F = '"Segoe UI", "PingFang SC", "Microsoft YaHei", sans-serif';
@@ -42,7 +42,7 @@
     g.fillStyle = "#16181D"; g.font = `bold 28px ${F}`; g.textBaseline = "middle";
     g.fillText(`${pet.name} · 拼豆图纸`, pad, 36);
     g.font = `16px ${F}`; g.fillStyle = "#5B606B";
-    g.fillText(`${pet.code} · ${pet.tier.name} · ${G}×${G} 格,空格不放豆`, pad, 68);
+    g.fillText(`${pet.code} · ${pet.tier.name} · ${G}×${G} 格,空格不放豆 · 直径 5 mm 的豆,整块 ${G * 5}×${G * 5} mm`, pad, 68);
     const top = 112;
     g.textAlign = "center";
     for (let i = 0; i < G; i++) {
@@ -81,6 +81,12 @@
       g.fillStyle = "#5B606B"; g.font = `16px ${F}`;
       g.fillText(`可动手臂:另做 2 条豆条,每条 3 颗 ${COLOR_NAME[pet.accent] || pet.accent},`, pad, ly + 4);
       g.fillText(`分别装在第 8 行第 ${xl + 1} 格和第 ${G - xl} 格的外侧,能转动。`, pad, ly + 30);
+      ly += 64;
+    }
+    if (passed.build) { // 过了第 4 关:加两颗脚豆,能插到骨架扁条的孔里
+      g.fillStyle = "#5B606B"; g.font = `16px ${F}`;
+      g.fillText(`站上骨架:底边下面,第 ${G / 2 - 2}、${G / 2 - 1} 格中间和第 ${G / 2 + 2}、${G / 2 + 3} 格中间,各竖着粘 1 颗豆当脚(相距 20 mm),`, pad, ly + 4);
+      g.fillText("正好插进扁条上隔一个孔的两个孔里。", pad, ly + 30);
     }
     cv.toBlob((b) => b && save(b, `拼豆图纸-${pet.code}.png`));
   }
@@ -94,6 +100,8 @@
       palette: pal.map(({ sym, hex, name, n }) => ({ sym, hex, name: name.trim(), count: n })),
       grid: pet.cells.map((row) => row.map((c) => (c ? sym.get(c) : ".")).join("")),
       arms: passed.puppet ? { beads: 3, color: pet.accent, row: 8 } : null,
+      bead_mm: 5, panel_mm: pet.cells.length * 5,
+      feet: passed.build ? { beads: 2, spacing_mm: 20, between_cols: [[pet.cells.length / 2 - 2, pet.cells.length / 2 - 1], [pet.cells.length / 2 + 2, pet.cells.length / 2 + 3]] } : null,
     };
     save(new Blob([JSON.stringify(out, null, 2)], { type: "application/json" }), `拼豆伙伴-${pet.code}.json`);
   }
