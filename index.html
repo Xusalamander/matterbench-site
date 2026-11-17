@@ -1,0 +1,310 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>MatterBench · 从想法到功能原型</title>
+  <meta name="description" content="MatterBench 是 OriginFab 正在开发的 AI 辅助桌面创作系统,帮助设计师、创客和教育用户把想法做成可组装、可调整的实体作品与功能原型。欢迎留下联系方式,参与原型体验与共创。">
+  <meta property="og:title" content="MatterBench · Ideas you can build and improve">
+  <meta property="og:description" content="AI 辅助设计 + 桌面制作,把想法做成能动手改的功能原型。">
+  <link rel="icon" href="assets/logo.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="assets/promo.css">
+  <script src="config.js" defer></script>
+  <script src="assets/signup.js" defer></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js" defer></script>
+  <script src="assets/showcase/lattice.js" defer></script>
+  <script src="assets/showcase/lamp-core.js" defer></script>
+  <script src="assets/showcase/viewer.js" defer></script>
+  <script src="assets/showcase/replay.js" defer></script>
+</head>
+<body>
+  <header class="top">
+    <div class="wrap">
+      <a class="mark" href="#top"><img src="assets/logo.svg" alt=""> MatterBench <span>by OriginFab</span></a>
+      <nav>
+        <a href="#showcase" class="hide-sm">作品</a>
+        <a href="#system" class="hide-sm">介绍</a>
+        <a href="#uses" class="hide-sm">能做什么</a>
+        <a href="demo.html" data-cta="nav-demo">在线体验</a>
+        <a href="#together" class="hide-sm">一起做</a>
+      </nav>
+      <a class="btn btn-lime btn-sm" href="#join" data-cta="top">留个联系方式</a>
+    </div>
+  </header>
+
+  <main id="top">
+    <section class="hero dark">
+      <div class="wrap hero-grid">
+        <div>
+          <span class="kicker">OriginFab</span>
+          <h1 style="margin-top:18px">Matter<b>Bench</b></h1>
+          <p class="sub">AI 辅助的桌面创作系统</p>
+          <p class="sub-en">AI-Assisted Desktop Fabrication System</p>
+
+          <p class="lead">从想法到功能原型</p>
+          <p class="lead-en">Ideas you can build and improve</p>
+          <ul class="points">
+            <li><i>01</i>AI 辅助设计与 CAD 共创</li>
+            <li><i>02</i>构件制作、组装、测试与迭代</li>
+            <li><i>03</i>可拓展传感与机器人交互</li>
+          </ul>
+          <p class="en points-en">AI-assisted design and editable CAD. Component fabrication, assembly and testing. Extensions for sensing and actuation.</p>
+          <div class="cta-row no-print">
+            <a class="btn btn-lime" href="#join" data-cta="hero">我感兴趣 →</a>
+            <a class="btn btn-line" href="demo.html" data-cta="hero-demo">先在线玩一下</a>
+          </div>
+        </div>
+
+        <div class="hero-art">
+          <figure style="margin:0">
+            <svg viewBox="0 0 560 460" role="img" aria-label="从想法、到构件、到能动的作品">
+              <defs>
+                <linearGradient id="h-line" x1="0" x2="1"><stop offset="0" stop-color="#2BB0C9"/><stop offset="1" stop-color="#C6F04A"/></linearGradient>
+              </defs>
+              <g transform="translate(20 40)">
+                <rect width="200" height="150" rx="18" fill="#23262D" stroke="#3A3E47"/>
+                <text x="18" y="30" fill="#9CA1AA" font-family="Consolas, monospace" font-size="12">01 · 想法 Idea</text>
+                <rect x="18" y="46" width="150" height="34" rx="17" fill="#2E323A"/>
+                <text x="34" y="68" fill="#EDEDE8" font-family="Inter, sans-serif" font-size="13">一个会点头的台灯?</text>
+                <rect x="40" y="92" width="142" height="40" rx="12" fill="#2BB0C9" fill-opacity=".16" stroke="#2BB0C9" stroke-opacity=".5"/>
+                <text x="54" y="117" fill="#2BB0C9" font-family="Consolas, monospace" font-size="12" font-weight="700">AI · 3 个方案</text>
+              </g>
+              <path d="M220 115 C 262 115, 262 115, 300 115" stroke="url(#h-line)" stroke-width="3" stroke-dasharray="6 6" fill="none"/>
+              <g transform="translate(300 40)">
+                <rect width="240" height="150" rx="18" fill="#23262D" stroke="#3A3E47"/>
+                <text x="18" y="30" fill="#9CA1AA" font-family="Consolas, monospace" font-size="12">02 · 构件 Parts</text>
+                <g stroke-linecap="round" stroke-width="10">
+                  <path d="M24 64h96" stroke="#2BB0C9"/><path d="M24 92h130" stroke="#C6F04A"/><path d="M24 120h70" stroke="#F28B2E"/>
+                </g>
+                <g>
+                  <circle cx="176" cy="66" r="12" fill="none" stroke="#EDEDE8" stroke-width="4"/>
+                  <circle cx="206" cy="66" r="12" fill="none" stroke="#EDEDE8" stroke-width="4"/>
+                  <rect x="168" y="100" width="18" height="18" rx="5" fill="#F28B2E"/><rect x="192" y="100" width="18" height="18" rx="5" fill="#2BB0C9"/>
+                </g>
+              </g>
+              <path d="M420 190 C 420 220, 380 230, 360 250" stroke="url(#h-line)" stroke-width="3" stroke-dasharray="6 6" fill="none"/>
+              <g transform="translate(120 240)">
+                <rect width="320" height="200" rx="18" fill="#23262D" stroke="#3A3E47"/>
+                <text x="18" y="30" fill="#9CA1AA" font-family="Consolas, monospace" font-size="12">03 · 能动的原型 Working prototype</text>
+                <ellipse cx="160" cy="176" rx="90" ry="8" fill="#000" opacity=".35"/>
+                <rect x="110" y="160" width="100" height="16" rx="8" fill="#F28B2E"/>
+                <path d="M160 160 L 150 104" stroke="#2BB0C9" stroke-width="10" stroke-linecap="round"/>
+                <path d="M150 104 L 200 76" stroke="#C6F04A" stroke-width="10" stroke-linecap="round"/>
+                <circle cx="160" cy="160" r="7" fill="#16181D" stroke="#EDEDE8" stroke-width="3"/>
+                <circle cx="150" cy="104" r="7" fill="#16181D" stroke="#EDEDE8" stroke-width="3"/>
+                <path d="M196 60 l 34 0 l -8 34 z" fill="#EDEDE8"/>
+                <path d="M214 100 l 18 30" stroke="#C6F04A" stroke-width="2" stroke-dasharray="3 4" opacity=".7"/>
+                <path d="M222 98 l 30 22" stroke="#C6F04A" stroke-width="2" stroke-dasharray="3 4" opacity=".7"/>
+                <rect x="244" y="132" width="44" height="30" rx="6" fill="#16181D" stroke="#3A3E47"/>
+                <circle cx="266" cy="147" r="7" fill="#C6F04A"/>
+                <path d="M244 147 C 222 147, 210 140, 200 130" stroke="#9CA1AA" stroke-width="2" fill="none"/>
+                <path d="M120 70 a 26 26 0 0 1 0 40" stroke="#2BB0C9" stroke-width="2.5" fill="none" stroke-linecap="round"/>
+                <path d="M108 78 a 14 14 0 0 1 0 24" stroke="#2BB0C9" stroke-width="2.5" fill="none" stroke-linecap="round"/>
+              </g>
+              <text x="540" y="456" text-anchor="end" fill="#6F747D" font-family="Consolas, monospace" font-size="10">概念示意 / Concept illustration</text>
+            </svg>
+          </figure>
+        </div>
+      </div>
+    </section>
+
+    <section id="showcase" class="showcase dark no-print">
+      <div class="wrap">
+        <span class="kicker">Showcase</span>
+        <h2>让创造无黑盒<small>TURN YOUR IDEA TO DESKTOP</small></h2>
+        <p class="sc-lead">说出想法,AI 帮你画图案、给搭法,一步步做出来。</p>
+        <div class="sc-replay" data-replay>
+          <div class="sc-steps" data-replay-steps></div>
+          <div class="sc-grid">
+            <div class="sc-chat">
+              <div class="sc-chat-head"><b>AI 助手</b><span data-replay-label>演示回放</span></div>
+              <div class="sc-msgs" data-replay-msgs aria-live="polite">
+                <p class="sc-static">说出想法 → AI 在拼豆面板上画图案 → 搭转动座 → 装上图案 → 背后放灯 → 转一转。</p>
+              </div>
+              <div class="sc-ctrl"><button type="button" data-replay-toggle>暂停</button><button type="button" data-replay-restart>重播</button></div>
+            </div>
+            <figure class="sc-view" data-showcase="assets/showcase/flower-scene.json" aria-label="3D 作品:装在转动座上的拼豆花,背后一盏灯照亮它">
+              <div class="sc-panel" data-replay-panel hidden><span>拼豆面板 14×14</span><div class="sc-board"></div></div>
+              <p class="sc-fallback">3D 画面没能加载,换用电脑浏览器打开试试。</p>
+              <figcaption>桌面上可拖动换角度</figcaption>
+            </figure>
+          </div>
+        </div>
+        <div class="sc-foot">
+          <p class="sc-desk"><span aria-hidden="true">🖥</span> 搭建台为电脑浏览器设计 · Built for desktop browsers</p>
+          <a class="btn btn-lime" href="#join" data-signup data-cta="showcase" target="_blank" rel="noopener">申请测试邀请 →</a>
+          <p class="sc-note">填一张表就行,我们看过后把邀请发给你。</p>
+        </div>
+      </div>
+    </section>
+
+    <section id="system">
+      <div class="wrap">
+        <span class="kicker">The System</span>
+        <h2>MatterBench 是什么<small>WHAT IT IS</small></h2>
+        <div class="two">
+          <div>
+            <p>MatterBench 是 OriginFab 正在开发的软硬件一体化创意制造系统，把 AI 辅助设计软件和桌面制作设备结合起来，帮助设计师、创客及教育用户，把想法变成可组装、可调整的实体作品与功能原型。</p>
+            <p>你在软件里说出需求、比较并修改方案，再把构件做出来，完成组装、测试与迭代。它面向日常物件的创作、改造与功能验证，也可以加上传感器和驱动模块，变成能感知、会响应的交互原型。</p>
+          </div>
+          <div class="en">
+            <p>MatterBench is an integrated creative fabrication system under development at OriginFab. It combines AI-assisted design software with a desktop making device, helping designers, makers and educators turn ideas into physical creations and functional prototypes that can be assembled and modified.</p>
+            <p>Express what you need, explore and refine designs, then make the parts to assemble, test and iterate. It supports everyday creation, adaptation and functional prototyping, and sensors and actuators can extend creations into interactive prototypes that sense and respond.</p>
+          </div>
+        </div>
+        <ol class="flow">
+          <li><b>说出需求</b><span>Express needs</span></li>
+          <li><b>比较并修改方案</b><span>Explore and refine</span></li>
+          <li><b>做出构件</b><span>Make the parts</span></li>
+          <li><b>组装、测试与迭代</b><span>Assemble, test, iterate</span></li>
+          <li><b>传感与驱动拓展</b><span>Sense and respond</span></li>
+        </ol>
+      </div>
+    </section>
+
+    <section id="uses" style="padding-top:0">
+      <div class="wrap">
+        <span class="kicker">What You Can Make</span>
+        <h2>可以拿它做什么<small>WHAT YOU CAN MAKE</small></h2>
+        <div class="uses" style="margin-top:28px">
+          <figure class="use">
+            <div class="pic">
+              <svg viewBox="0 0 400 250" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
+                <rect width="400" height="250" fill="#EFEFEA"/><rect y="180" width="400" height="70" fill="#E2DFD6"/>
+                <rect x="70" y="80" width="110" height="100" rx="10" fill="#F4F4EF" stroke="#16181D" stroke-width="3"/>
+                <path d="M70 110h110" stroke="#16181D" stroke-width="3"/><circle cx="125" cy="95" r="5" fill="#16181D"/>
+                <g stroke-linecap="round" stroke-width="9"><path d="M200 120 h 70" stroke="#2BB0C9"/><path d="M270 120 v 60" stroke="#2BB0C9"/><path d="M200 120 v 60" stroke="#F28B2E"/></g>
+                <rect x="190" y="104" width="92" height="12" rx="6" fill="#C6F04A"/>
+                <path d="M300 60 l 10 -14 l 10 14 l -10 14 z" fill="#F28B2E"/>
+                <path d="M318 82 c 12 6 18 18 16 30" stroke="#16181D" stroke-width="2.5" fill="none" stroke-dasharray="3 4"/>
+              </svg>
+            </div>
+            <figcaption><b>改造日常物件</b><span>Adapt everyday things</span><p>给手边的东西加一个支架、一个卡扣、一个刚好合适的配件。</p></figcaption>
+          </figure>
+          <figure class="use">
+            <div class="pic">
+              <svg viewBox="0 0 400 250" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
+                <rect width="400" height="250" fill="#16181D"/>
+                <rect x="40" y="150" width="320" height="16" rx="8" fill="#2A2D34"/>
+                <g><circle cx="110" cy="90" r="22" fill="#2BB0C9"/><rect x="88" y="114" width="44" height="36" rx="12" fill="#2BB0C9"/></g>
+                <g><circle cx="200" cy="80" r="24" fill="#C6F04A"/><rect x="176" y="106" width="48" height="44" rx="12" fill="#C6F04A"/></g>
+                <g><circle cx="290" cy="90" r="22" fill="#F28B2E"/><rect x="268" y="114" width="44" height="36" rx="12" fill="#F28B2E"/></g>
+                <g fill="#EDEDE8"><rect x="96" y="140" width="28" height="8" rx="4"/><rect x="186" y="140" width="28" height="8" rx="4"/><rect x="276" y="140" width="28" height="8" rx="4"/></g>
+                <g stroke="#EDEDE8" stroke-width="3" stroke-linecap="round"><path d="M100 196h40M180 196h40M260 196h40"/></g>
+              </svg>
+            </div>
+            <figcaption><b>课程与工作坊</b><span>Courses &amp; workshops</span><p>一节课里从想法做到能上手试的原型,适合小组协作。</p></figcaption>
+          </figure>
+          <figure class="use">
+            <div class="pic">
+              <svg viewBox="0 0 400 250" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
+                <rect width="400" height="250" fill="#F6F6F2"/>
+                <g stroke-linecap="round" stroke-width="10">
+                  <path d="M150 190 L 170 140" stroke="#F28B2E"/><path d="M250 190 L 230 140" stroke="#F28B2E"/>
+                  <path d="M170 140 H 230" stroke="#2BB0C9"/><path d="M200 140 V 104" stroke="#C6F04A"/>
+                </g>
+                <rect x="170" y="62" width="60" height="44" rx="12" fill="#2BB0C9"/>
+                <circle cx="188" cy="84" r="7" fill="#F4F4EF"/><circle cx="212" cy="84" r="7" fill="#F4F4EF"/>
+                <circle cx="188" cy="84" r="3" fill="#16181D"/><circle cx="212" cy="84" r="3" fill="#16181D"/>
+                <g fill="#16181D"><circle cx="170" cy="140" r="7"/><circle cx="230" cy="140" r="7"/><circle cx="150" cy="192" r="7"/><circle cx="250" cy="192" r="7"/></g>
+                <path d="M262 76 a 20 20 0 0 1 0 30 M274 66 a 34 34 0 0 1 0 50" stroke="#1F8FA6" stroke-width="3" fill="none" stroke-linecap="round"/>
+                <path d="M110 200 h 180" stroke="#16181D" stroke-width="3"/>
+              </svg>
+            </div>
+            <figcaption><b>会动、会响应的原型</b><span>Interactive prototypes</span><p>加上传感与驱动,让作品能感知、会动、能回应你。</p></figcaption>
+          </figure>
+        </div>
+      </div>
+    </section>
+
+    <section id="try" class="no-print" style="padding-top:0">
+      <div class="wrap">
+        <div class="demo-card">
+          <div class="demo-pic" aria-hidden="true">
+            <svg viewBox="0 0 420 300" preserveAspectRatio="xMidYMid slice"><defs><radialGradient id="lampGlow" cx="50%" cy="55%" r="60%"><stop offset="0" stop-color="#FFB65C" stop-opacity=".55"/><stop offset=".55" stop-color="#FFB65C" stop-opacity=".12"/><stop offset="1" stop-color="#FFB65C" stop-opacity="0"/></radialGradient><radialGradient id="floorGlow" cx="50%" cy="50%" r="50%"><stop offset="0" stop-color="#FFB65C" stop-opacity=".45"/><stop offset="1" stop-color="#FFB65C" stop-opacity="0"/></radialGradient></defs><rect width="420" height="300" fill="#07080A"/><ellipse cx="215" cy="222" rx="190" ry="30" fill="url(#floorGlow)"/><circle cx="205" cy="140" r="170" fill="url(#lampGlow)"/><path d="M110 208 L280 208 L328 188 L328 198 L280 220 L110 220 Z" fill="#2A2D34"/><rect x="116" y="44" width="164" height="164" fill="#1A1626"/><circle cx="126.5" cy="54.5" r="5.6" fill="#2C2740"/><circle cx="139.5" cy="54.5" r="5.6" fill="#2C2740"/><circle cx="152.5" cy="54.5" r="5.6" fill="#2C2740"/><circle cx="165.5" cy="54.5" r="5.6" fill="#2C2740"/><circle cx="178.5" cy="54.5" r="5.6" fill="#2C2740"/><circle cx="191.5" cy="54.5" r="5.6" fill="#2C2740"/><circle cx="204.5" cy="54.5" r="5.6" fill="#2C2740"/><circle cx="217.5" cy="54.5" r="5.6" fill="#2C2740"/><circle cx="230.5" cy="54.5" r="5.6" fill="#2C2740"/><circle cx="243.5" cy="54.5" r="5.6" fill="#2C2740"/><circle cx="256.5" cy="54.5" r="5.6" fill="#2C2740"/><circle cx="269.5" cy="54.5" r="5.6" fill="#2C2740"/><circle cx="126.5" cy="67.5" r="5.6" fill="#2C2740"/><circle cx="139.5" cy="67.5" r="5.6" fill="#2C2740"/><circle cx="152.5" cy="67.5" r="5.6" fill="#2C2740"/><circle cx="165.5" cy="67.5" r="5.6" fill="#2C2740"/><circle cx="178.5" cy="67.5" r="5.6" fill="#2C2740"/><circle cx="191.5" cy="67.5" r="5.6" fill="#2C2740"/><circle cx="204.5" cy="67.5" r="5.6" fill="#2C2740"/><circle cx="217.5" cy="67.5" r="5.6" fill="#FFD27A"/><circle cx="230.5" cy="67.5" r="5.6" fill="#FFF4DC"/><circle cx="243.5" cy="67.5" r="5.6" fill="#2C2740"/><circle cx="256.5" cy="67.5" r="5.6" fill="#FFD27A"/><circle cx="269.5" cy="67.5" r="5.6" fill="#2C2740"/><circle cx="126.5" cy="80.5" r="5.6" fill="#2C2740"/><circle cx="139.5" cy="80.5" r="5.6" fill="#FFF4DC"/><circle cx="152.5" cy="80.5" r="5.6" fill="#2C2740"/><circle cx="165.5" cy="80.5" r="5.6" fill="#2C2740"/><circle cx="178.5" cy="80.5" r="5.6" fill="#2C2740"/><circle cx="191.5" cy="80.5" r="5.6" fill="#2C2740"/><circle cx="204.5" cy="80.5" r="5.6" fill="#2C2740"/><circle cx="217.5" cy="80.5" r="5.6" fill="#FFF4DC"/><circle cx="230.5" cy="80.5" r="5.6" fill="#FFF4DC"/><circle cx="243.5" cy="80.5" r="5.6" fill="#2C2740"/><circle cx="256.5" cy="80.5" r="5.6" fill="#FFF4DC"/><circle cx="269.5" cy="80.5" r="5.6" fill="#2C2740"/><circle cx="126.5" cy="93.5" r="5.6" fill="#2C2740"/><circle cx="139.5" cy="93.5" r="5.6" fill="#2C2740"/><circle cx="152.5" cy="93.5" r="5.6" fill="#2C2740"/><circle cx="165.5" cy="93.5" r="5.6" fill="#2C2740"/><circle cx="178.5" cy="93.5" r="5.6" fill="#2C2740"/><circle cx="191.5" cy="93.5" r="5.6" fill="#2C2740"/><circle cx="204.5" cy="93.5" r="5.6" fill="#FFF4DC"/><circle cx="217.5" cy="93.5" r="5.6" fill="#FFF4DC"/><circle cx="230.5" cy="93.5" r="5.6" fill="#FFF4DC"/><circle cx="243.5" cy="93.5" r="5.6" fill="#2C2740"/><circle cx="256.5" cy="93.5" r="5.6" fill="#2C2740"/><circle cx="269.5" cy="93.5" r="5.6" fill="#2C2740"/><circle cx="126.5" cy="106.5" r="5.6" fill="#2C2740"/><circle cx="139.5" cy="106.5" r="5.6" fill="#2C2740"/><circle cx="152.5" cy="106.5" r="5.6" fill="#FFF4DC"/><circle cx="165.5" cy="106.5" r="5.6" fill="#2C2740"/><circle cx="178.5" cy="106.5" r="5.6" fill="#2C2740"/><circle cx="191.5" cy="106.5" r="5.6" fill="#2C2740"/><circle cx="204.5" cy="106.5" r="5.6" fill="#2C2740"/><circle cx="217.5" cy="106.5" r="5.6" fill="#2C2740"/><circle cx="230.5" cy="106.5" r="5.6" fill="#FFF4DC"/><circle cx="243.5" cy="106.5" r="5.6" fill="#FFF4DC"/><circle cx="256.5" cy="106.5" r="5.6" fill="#2C2740"/><circle cx="269.5" cy="106.5" r="5.6" fill="#2C2740"/><circle cx="126.5" cy="119.5" r="5.6" fill="#2C2740"/><circle cx="139.5" cy="119.5" r="5.6" fill="#2C2740"/><circle cx="152.5" cy="119.5" r="5.6" fill="#2C2740"/><circle cx="165.5" cy="119.5" r="5.6" fill="#2C2740"/><circle cx="178.5" cy="119.5" r="5.6" fill="#2C2740"/><circle cx="191.5" cy="119.5" r="5.6" fill="#2C2740"/><circle cx="204.5" cy="119.5" r="5.6" fill="#2C2740"/><circle cx="217.5" cy="119.5" r="5.6" fill="#2C2740"/><circle cx="230.5" cy="119.5" r="5.6" fill="#2C2740"/><circle cx="243.5" cy="119.5" r="5.6" fill="#2C2740"/><circle cx="256.5" cy="119.5" r="5.6" fill="#2C2740"/><circle cx="269.5" cy="119.5" r="5.6" fill="#2C2740"/><circle cx="126.5" cy="132.5" r="5.6" fill="#2C2740"/><circle cx="139.5" cy="132.5" r="5.6" fill="#2C2740"/><circle cx="152.5" cy="132.5" r="5.6" fill="#FFD27A"/><circle cx="165.5" cy="132.5" r="5.6" fill="#2C2740"/><circle cx="178.5" cy="132.5" r="5.6" fill="#2C2740"/><circle cx="191.5" cy="132.5" r="5.6" fill="#2C2740"/><circle cx="204.5" cy="132.5" r="5.6" fill="#2C2740"/><circle cx="217.5" cy="132.5" r="5.6" fill="#2C2740"/><circle cx="230.5" cy="132.5" r="5.6" fill="#2C2740"/><circle cx="243.5" cy="132.5" r="5.6" fill="#2C2740"/><circle cx="256.5" cy="132.5" r="5.6" fill="#2C2740"/><circle cx="269.5" cy="132.5" r="5.6" fill="#2C2740"/><circle cx="126.5" cy="145.5" r="5.6" fill="#2C2740"/><circle cx="139.5" cy="145.5" r="5.6" fill="#2C2740"/><circle cx="152.5" cy="145.5" r="5.6" fill="#2C2740"/><circle cx="165.5" cy="145.5" r="5.6" fill="#2C2740"/><circle cx="178.5" cy="145.5" r="5.6" fill="#2C2740"/><circle cx="191.5" cy="145.5" r="5.6" fill="#2C2740"/><circle cx="204.5" cy="145.5" r="5.6" fill="#2C2740"/><circle cx="217.5" cy="145.5" r="5.6" fill="#FFD27A"/><circle cx="230.5" cy="145.5" r="5.6" fill="#2C2740"/><circle cx="243.5" cy="145.5" r="5.6" fill="#2C2740"/><circle cx="256.5" cy="145.5" r="5.6" fill="#2C2740"/><circle cx="269.5" cy="145.5" r="5.6" fill="#2C2740"/><circle cx="126.5" cy="158.5" r="5.6" fill="#2C2740"/><circle cx="139.5" cy="158.5" r="5.6" fill="#2C2740"/><circle cx="152.5" cy="158.5" r="5.6" fill="#2C2740"/><circle cx="165.5" cy="158.5" r="5.6" fill="#2C2740"/><circle cx="178.5" cy="158.5" r="5.6" fill="#2C2740"/><circle cx="191.5" cy="158.5" r="5.6" fill="#2C2740"/><circle cx="204.5" cy="158.5" r="5.6" fill="#2C2740"/><circle cx="217.5" cy="158.5" r="5.6" fill="#2C2740"/><circle cx="230.5" cy="158.5" r="5.6" fill="#2C2740"/><circle cx="243.5" cy="158.5" r="5.6" fill="#2C2740"/><circle cx="256.5" cy="158.5" r="5.6" fill="#2C2740"/><circle cx="269.5" cy="158.5" r="5.6" fill="#2C2740"/><circle cx="126.5" cy="171.5" r="5.6" fill="#2C2740"/><circle cx="139.5" cy="171.5" r="5.6" fill="#2C2740"/><circle cx="152.5" cy="171.5" r="5.6" fill="#FFD27A"/><circle cx="165.5" cy="171.5" r="5.6" fill="#2C2740"/><circle cx="178.5" cy="171.5" r="5.6" fill="#2C2740"/><circle cx="191.5" cy="171.5" r="5.6" fill="#2C2740"/><circle cx="204.5" cy="171.5" r="5.6" fill="#2C2740"/><circle cx="217.5" cy="171.5" r="5.6" fill="#2C2740"/><circle cx="230.5" cy="171.5" r="5.6" fill="#2C2740"/><circle cx="243.5" cy="171.5" r="5.6" fill="#2C2740"/><circle cx="256.5" cy="171.5" r="5.6" fill="#2C2740"/><circle cx="269.5" cy="171.5" r="5.6" fill="#2C2740"/><circle cx="126.5" cy="184.5" r="5.6" fill="#2C2740"/><circle cx="139.5" cy="184.5" r="5.6" fill="#2C2740"/><circle cx="152.5" cy="184.5" r="5.6" fill="#2C2740"/><circle cx="165.5" cy="184.5" r="5.6" fill="#2C2740"/><circle cx="178.5" cy="184.5" r="5.6" fill="#2C2740"/><circle cx="191.5" cy="184.5" r="5.6" fill="#2C2740"/><circle cx="204.5" cy="184.5" r="5.6" fill="#2C2740"/><circle cx="217.5" cy="184.5" r="5.6" fill="#2C2740"/><circle cx="230.5" cy="184.5" r="5.6" fill="#2C2740"/><circle cx="243.5" cy="184.5" r="5.6" fill="#2C2740"/><circle cx="256.5" cy="184.5" r="5.6" fill="#2C2740"/><circle cx="269.5" cy="184.5" r="5.6" fill="#2C2740"/><circle cx="126.5" cy="197.5" r="5.6" fill="#2C2740"/><circle cx="139.5" cy="197.5" r="5.6" fill="#2C2740"/><circle cx="152.5" cy="197.5" r="5.6" fill="#2C2740"/><circle cx="165.5" cy="197.5" r="5.6" fill="#2C2740"/><circle cx="178.5" cy="197.5" r="5.6" fill="#2C2740"/><circle cx="191.5" cy="197.5" r="5.6" fill="#2C2740"/><circle cx="204.5" cy="197.5" r="5.6" fill="#2C2740"/><circle cx="217.5" cy="197.5" r="5.6" fill="#2C2740"/><circle cx="230.5" cy="197.5" r="5.6" fill="#2C2740"/><circle cx="243.5" cy="197.5" r="5.6" fill="#2C2740"/><circle cx="256.5" cy="197.5" r="5.6" fill="#2C2740"/><circle cx="269.5" cy="197.5" r="5.6" fill="#2C2740"/><ellipse cx="283.0" cy="54.5" rx="2.4" ry="5.6" fill="#231F35"/><ellipse cx="288.6" cy="52.1" rx="2.4" ry="5.6" fill="#231F35"/><ellipse cx="294.2" cy="49.7" rx="2.4" ry="5.6" fill="#231F35"/><ellipse cx="299.8" cy="47.3" rx="2.4" ry="5.6" fill="#231F35"/><ellipse cx="305.4" cy="44.9" rx="2.4" ry="5.6" fill="#231F35"/><ellipse cx="311.0" cy="42.5" rx="2.4" ry="5.6" fill="#231F35"/><ellipse cx="316.6" cy="40.1" rx="2.4" ry="5.6" fill="#231F35"/><ellipse cx="322.2" cy="37.7" rx="2.4" ry="5.6" fill="#231F35"/><ellipse cx="283.0" cy="67.5" rx="2.4" ry="5.6" fill="#231F35"/><ellipse cx="288.6" cy="65.1" rx="2.4" ry="5.6" fill="#231F35"/><ellipse cx="294.2" cy="62.7" rx="2.4" ry="5.6" fill="#231F35"/><ellipse cx="299.8" cy="60.3" rx="2.4" ry="5.6" fill="#231F35"/><ellipse cx="305.4" cy="57.9" rx="2.4" ry="5.6" fill="#231F35"/><ellipse cx="311.0" cy="55.5" rx="2.4" ry="5.6" fill="#231F35"/><ellipse cx="316.6" cy="53.1" rx="2.4" ry="5.6" fill="#231F35"/><ellipse cx="322.2" cy="50.7" rx="2.4" ry="5.6" fill="#231F35"/><ellipse cx="283.0" cy="80.5" rx="2.4" ry="5.6" fill="#231F35"/><ellipse cx="288.6" cy="78.1" rx="2.4" ry="5.6" fill="#231F35"/><ellipse cx="294.2" cy="75.7" rx="2.4" ry="5.6" fill="#231F35"/><ellipse cx="299.8" cy="73.3" rx="2.4" ry="5.6" fill="#231F35"/><ellipse cx="305.4" cy="70.9" rx="2.4" ry="5.6" fill="#231F35"/><ellipse cx="311.0" cy="68.5" rx="2.4" ry="5.6" fill="#231F35"/><ellipse cx="316.6" cy="66.1" rx="2.4" ry="5.6" fill="#231F35"/><ellipse cx="322.2" cy="63.7" rx="2.4" ry="5.6" fill="#231F35"/><ellipse cx="283.0" cy="93.5" rx="2.4" ry="5.6" fill="#231F35"/><ellipse cx="288.6" cy="91.1" rx="2.4" ry="5.6" fill="#231F35"/><ellipse cx="294.2" cy="88.7" rx="2.4" ry="5.6" fill="#231F35"/><ellipse cx="299.8" cy="86.3" rx="2.4" ry="5.6" fill="#231F35"/><ellipse cx="305.4" cy="83.9" rx="2.4" ry="5.6" fill="#231F35"/><ellipse cx="311.0" cy="81.5" rx="2.4" ry="5.6" fill="#231F35"/><ellipse cx="316.6" cy="79.1" rx="2.4" ry="5.6" fill="#231F35"/><ellipse cx="322.2" cy="76.7" rx="2.4" ry="5.6" fill="#FFD27A"/><ellipse cx="283.0" cy="106.5" rx="2.4" ry="5.6" fill="#231F35"/><ellipse cx="288.6" cy="104.1" rx="2.4" ry="5.6" fill="#FFD27A"/><ellipse cx="294.2" cy="101.7" rx="2.4" ry="5.6" fill="#231F35"/><ellipse cx="299.8" cy="99.3" rx="2.4" ry="5.6" fill="#231F35"/><ellipse cx="305.4" cy="96.9" rx="2.4" ry="5.6" fill="#231F35"/><ellipse cx="311.0" cy="94.5" rx="2.4" ry="5.6" fill="#231F35"/><ellipse cx="316.6" cy="92.1" rx="2.4" ry="5.6" fill="#231F35"/><ellipse cx="322.2" cy="89.7" rx="2.4" ry="5.6" fill="#231F35"/><ellipse cx="283.0" cy="119.5" rx="2.4" ry="5.6" fill="#231F35"/><ellipse cx="288.6" cy="117.1" rx="2.4" ry="5.6" fill="#231F35"/><ellipse cx="294.2" cy="114.7" rx="2.4" ry="5.6" fill="#231F35"/><ellipse cx="299.8" cy="112.3" rx="2.4" ry="5.6" fill="#FFD27A"/><ellipse cx="305.4" cy="109.9" rx="2.4" ry="5.6" fill="#231F35"/><ellipse cx="311.0" cy="107.5" rx="2.4" ry="5.6" fill="#231F35"/><ellipse cx="316.6" cy="105.1" rx="2.4" ry="5.6" fill="#231F35"/><ellipse cx="322.2" cy="102.7" rx="2.4" ry="5.6" fill="#231F35"/><ellipse cx="283.0" cy="132.5" rx="2.4" ry="5.6" fill="#231F35"/><ellipse cx="288.6" cy="130.1" rx="2.4" ry="5.6" fill="#231F35"/><ellipse cx="294.2" cy="127.7" rx="2.4" ry="5.6" fill="#231F35"/><ellipse cx="299.8" cy="125.3" rx="2.4" ry="5.6" fill="#231F35"/><ellipse cx="305.4" cy="122.9" rx="2.4" ry="5.6" fill="#231F35"/><ellipse cx="311.0" cy="120.5" rx="2.4" ry="5.6" fill="#231F35"/><ellipse cx="316.6" cy="118.1" rx="2.4" ry="5.6" fill="#231F35"/><ellipse cx="322.2" cy="115.7" rx="2.4" ry="5.6" fill="#231F35"/><ellipse cx="283.0" cy="145.5" rx="2.4" ry="5.6" fill="#231F35"/><ellipse cx="288.6" cy="143.1" rx="2.4" ry="5.6" fill="#231F35"/><ellipse cx="294.2" cy="140.7" rx="2.4" ry="5.6" fill="#231F35"/><ellipse cx="299.8" cy="138.3" rx="2.4" ry="5.6" fill="#231F35"/><ellipse cx="305.4" cy="135.9" rx="2.4" ry="5.6" fill="#231F35"/><ellipse cx="311.0" cy="133.5" rx="2.4" ry="5.6" fill="#231F35"/><ellipse cx="316.6" cy="131.1" rx="2.4" ry="5.6" fill="#231F35"/><ellipse cx="322.2" cy="128.7" rx="2.4" ry="5.6" fill="#231F35"/><ellipse cx="283.0" cy="158.5" rx="2.4" ry="5.6" fill="#231F35"/><ellipse cx="288.6" cy="156.1" rx="2.4" ry="5.6" fill="#231F35"/><ellipse cx="294.2" cy="153.7" rx="2.4" ry="5.6" fill="#231F35"/><ellipse cx="299.8" cy="151.3" rx="2.4" ry="5.6" fill="#231F35"/><ellipse cx="305.4" cy="148.9" rx="2.4" ry="5.6" fill="#231F35"/><ellipse cx="311.0" cy="146.5" rx="2.4" ry="5.6" fill="#231F35"/><ellipse cx="316.6" cy="144.1" rx="2.4" ry="5.6" fill="#231F35"/><ellipse cx="322.2" cy="141.7" rx="2.4" ry="5.6" fill="#231F35"/><ellipse cx="283.0" cy="171.5" rx="2.4" ry="5.6" fill="#231F35"/><ellipse cx="288.6" cy="169.1" rx="2.4" ry="5.6" fill="#FFD27A"/><ellipse cx="294.2" cy="166.7" rx="2.4" ry="5.6" fill="#231F35"/><ellipse cx="299.8" cy="164.3" rx="2.4" ry="5.6" fill="#231F35"/><ellipse cx="305.4" cy="161.9" rx="2.4" ry="5.6" fill="#231F35"/><ellipse cx="311.0" cy="159.5" rx="2.4" ry="5.6" fill="#231F35"/><ellipse cx="316.6" cy="157.1" rx="2.4" ry="5.6" fill="#231F35"/><ellipse cx="322.2" cy="154.7" rx="2.4" ry="5.6" fill="#231F35"/><ellipse cx="283.0" cy="184.5" rx="2.4" ry="5.6" fill="#231F35"/><ellipse cx="288.6" cy="182.1" rx="2.4" ry="5.6" fill="#FFD27A"/><ellipse cx="294.2" cy="179.7" rx="2.4" ry="5.6" fill="#231F35"/><ellipse cx="299.8" cy="177.3" rx="2.4" ry="5.6" fill="#231F35"/><ellipse cx="305.4" cy="174.9" rx="2.4" ry="5.6" fill="#FFD27A"/><ellipse cx="311.0" cy="172.5" rx="2.4" ry="5.6" fill="#231F35"/><ellipse cx="316.6" cy="170.1" rx="2.4" ry="5.6" fill="#231F35"/><ellipse cx="322.2" cy="167.7" rx="2.4" ry="5.6" fill="#231F35"/><ellipse cx="283.0" cy="197.5" rx="2.4" ry="5.6" fill="#231F35"/><ellipse cx="288.6" cy="195.1" rx="2.4" ry="5.6" fill="#231F35"/><ellipse cx="294.2" cy="192.7" rx="2.4" ry="5.6" fill="#231F35"/><ellipse cx="299.8" cy="190.3" rx="2.4" ry="5.6" fill="#231F35"/><ellipse cx="305.4" cy="187.9" rx="2.4" ry="5.6" fill="#231F35"/><ellipse cx="311.0" cy="185.5" rx="2.4" ry="5.6" fill="#231F35"/><ellipse cx="316.6" cy="183.1" rx="2.4" ry="5.6" fill="#231F35"/><ellipse cx="322.2" cy="180.7" rx="2.4" ry="5.6" fill="#231F35"/><path d="M278 44 L326 24 L326 188 L278 208 Z" fill="none" stroke="#3A3550" stroke-width="2"/><rect x="42" y="18" width="128" height="26" rx="13" fill="#FFB65C"/><text x="106" y="35" text-anchor="middle" fill="#16181D" font-family="Inter, sans-serif" font-size="11" font-weight="800">开灯 · 星光闪烁</text><g transform="translate(296 206)"><rect width="74" height="44" rx="6" fill="#1F6F4A"/><rect x="22" y="8" width="30" height="20" rx="2" fill="#B8BCC4"/><text x="37" y="40" text-anchor="middle" fill="#EDEDE8" font-family="Consolas, monospace" font-size="9" font-weight="700">ESP32</text></g></svg>
+          </div>
+          <div class="demo-text">
+            <span class="kicker">Try It Online</span>
+            <h2>四关在线体验<small>TRY THE DEMO · 4 LEVELS</small></h2>
+            <p>先领养一只随机的拼豆伙伴,再带它闯四关,每过一关它学会一个技能,能领的小奖品也升一档:① 照着图案拼一张拼豆像素画;② 做一个发光灯罩,给里面的 ESP32 + RGB 灯板选灯效,带走能直接烧录的代码;③ 用豆条拼一个会动的小人,豆子上的孔就是关节,摆姿势、让它动起来;④ 从叠拼豆开始,一步步用上圆棒、扁条和卡扣,搭出能站、能转的立体结构。不用注册,全部在本地运行。</p>
+            <p class="en">Adopt a random bead companion, then take it through four short levels. Each level teaches it a skill and upgrades your small prize: trace a bead pixel picture, light up a bead lampshade driven by an ESP32 and RGB panels (and take the code with you), build a moving bead-strip figure whose joints are the bead holes, and finally go 3D: stack beads, then add rods, strips and clips step by step into a structure that stands and turns. No sign-up; everything runs in your browser.</p>
+            <a class="btn btn-dark" href="demo.html" data-cta="section-demo">领养伙伴,开始闯关 →</a>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section id="about" class="team dark">
+      <div class="wrap">
+        <span class="kicker">About</span>
+        <h2>关于 OriginFab<small>ABOUT US</small></h2>
+        <div class="about">
+          <p>我们是一支来自设计、人机交互与数字制造领域的小团队，正在打磨 MatterBench 的原型。我们相信，做东西的人应该能把想法直接变成可以上手试、可以反复改的实物。</p>
+          <p class="en">We are a small team from design, human–computer interaction and digital fabrication, building MatterBench prototypes. We believe people who make things should be able to turn ideas into physical prototypes they can try, change and improve.</p>
+        </div>
+      </div>
+    </section>
+
+    <section id="together">
+      <div class="wrap">
+        <span class="kicker">Let’s Make Together</span>
+        <h2>一起做<small>LET’S MAKE TOGETHER</small></h2>
+        <div class="two" style="margin-top:20px">
+          <p>我们希望与真实使用者见面，了解你正在制作什么、遇到哪些困难。欢迎带着一个想法、作品或生活问题，参与原型体验、课程工作坊或案例共创。无需已有机器人开发经验。</p>
+          <p class="en">Meet us with an idea, project or everyday problem. We welcome learners and creators for prototype sessions, workshops and use-case development. Prior robotics experience is not required.</p>
+        </div>
+        <div class="partners">
+          <a class="partner" href="#join" data-cta="card-creator">
+            <div class="ico" style="background:rgba(198,240,74,.35);color:#4D6410"><svg viewBox="0 0 24 24"><path d="M12 3l2.2 4.6 5 .7-3.6 3.5.9 5-4.5-2.4-4.5 2.4.9-5L4.8 8.3l5-.7z"/></svg></div>
+            <div><h3>学员与创作者<small>Learners &amp; creators</small></h3><p>分享需求、体验原型、共同开发案例</p><p class="en">Share needs, test prototypes and develop use cases.</p></div>
+          </a>
+          <a class="partner" href="#join" data-cta="card-education">
+            <div class="ico" style="background:rgba(43,176,201,.16);color:#1F8FA6"><svg viewBox="0 0 24 24"><path d="M2 9l10-5 10 5-10 5z"/><path d="M6 11v5c3 2.5 9 2.5 12 0v-5"/><path d="M22 9v6"/></svg></div>
+            <div><h3>高校与教育机构<small>Education partners</small></h3><p>课程共建、工作坊、场地与小规模试教</p><p class="en">Co-develop courses, host workshops and support pilots.</p></div>
+          </a>
+          <a class="partner" href="#join" data-cta="card-tech">
+            <div class="ico" style="background:rgba(242,139,46,.16);color:#C2620F"><svg viewBox="0 0 24 24"><rect x="7" y="7" width="10" height="10" rx="2"/><path d="M10 2v5M14 2v5M10 17v5M14 17v5M2 10h5M2 14h5M17 10h5M17 14h5"/></svg></div>
+            <div><h3>技术与供应链<small>Technical &amp; supply-chain partners</small></h3><p>软件、硬件、材料与制造方面的合作</p><p class="en">Software, hardware, materials and manufacturing.</p></div>
+          </a>
+          <a class="partner" href="#join" data-cta="card-industry">
+            <div class="ico" style="background:rgba(22,24,29,.08);color:#16181D"><svg viewBox="0 0 24 24"><path d="M3 17l6-6 4 4 8-8"/><path d="M15 7h6v6"/></svg></div>
+            <div><h3>投资人与行业伙伴<small>Investors &amp; industry</small></h3><p>创意工具、消费硬件与教育科技合作</p><p class="en">Creative tools, consumer hardware and education technology.</p></div>
+          </a>
+        </div>
+      </div>
+    </section>
+
+    <section id="join" class="join dark">
+      <div class="wrap join-grid">
+        <div>
+          <h2>带着你的问题来聊聊</h2>
+          <p class="en-big">Bring a problem. Explore a possibility.</p>
+          <ul class="join-list">
+            <li>原型体验名额有限,我们会按你填的方向优先联系</li>
+            <li>线下或线上都可以</li>
+            <li>信息只用于联系你,不会给第三方</li>
+          </ul>
+          <p class="print-only" style="font:700 12pt var(--mono);margin:0" data-site-url></p>
+          <p class="print-only" style="font-size:7pt;color:#9CA1AA;margin:2mm 0 0">© OriginFab · MatterBench 仍在开发中,图片为概念示意。</p>
+        </div>
+
+        <div class="signup">
+          <h3>填写报名表<small>Sign up</small></h3>
+          <p>大约 1 分钟:怎么称呼你、联系方式、你是谁、想参与什么。</p>
+          <p class="en">About a minute: your name, how to reach you, who you are and what you'd like to join.</p>
+          <a class="btn btn-lime" href="#join" data-signup target="_blank" rel="noopener">填写报名表 →</a>
+          <p class="signup-note" data-signup-note>报名表会在新页面打开。</p>
+          <a class="lucky-link" href="demo.html">🎁 先领养一只拼豆伙伴,闯关领小奖品 →</a>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer>
+    <div class="wrap">
+      <span>© <span data-year></span> OriginFab · MatterBench</span>
+      <span>MatterBench 仍在开发中;页面中的图片为概念示意。</span>
+    </div>
+  </footer>
+</body>
+</html>

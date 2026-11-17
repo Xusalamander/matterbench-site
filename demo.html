@@ -1,0 +1,202 @@
+<!doctype html>
+<html lang="zh-CN" data-theme="dark">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>在线体验 · 领养你的拼豆伙伴 · MatterBench</title>
+  <meta name="description" content="抽一只随机的拼豆小伙伴,带它闯四关:拼出身体、学会发光、学会动、搭出立体骨架。闯得越多,能领的小奖品越好。全部在浏览器里运行。">
+  <link rel="icon" href="assets/logo.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="assets/demo.css">
+  <script src="config.js"></script>
+  <script src="assets/signup.js" defer></script>
+  <script src="assets/quest.js" defer></script>
+  <script src="assets/cardgen.js" defer></script>
+  <script src="assets/vendor/qrcode.js" defer></script>
+  <script src="assets/hub.js" defer></script>
+</head>
+<body class="hub-page">
+  <header class="bar">
+    <a class="logo" href="index.html" title="回到介绍页">
+      <img src="assets/logo.svg" alt="">
+      <b>MatterBench</b>
+      <span class="ver">在线体验</span>
+    </a>
+    <div class="bar-right" style="margin-left:auto">
+      <a class="txt" href="index.html">了解 MatterBench</a>
+    </div>
+  </header>
+
+  <main class="hub">
+    <div class="hub-in">
+      <section class="lucky">
+        <div class="lucky-stage">
+          <div class="card-wrap" id="cardWrap">
+            <canvas id="card" width="360" height="504" aria-label="拼豆伙伴卡"></canvas>
+            <div class="burst" id="burst" aria-hidden="true"></div>
+          </div>
+        </div>
+
+        <div class="lucky-side">
+          <div id="adopt">
+            <span class="step-tag">第 1 步</span>
+            <h1>领养你的拼豆伙伴</h1>
+            <p class="lead">抽一只随机的拼豆小伙伴,再带它闯四关:拼出身体、学会发光、学会动、搭出立体骨架。闯得越多,能领的小奖品越好。</p>
+            <label class="nick">
+              <span>给它的主人起个名字,印在卡上(可不填)</span>
+              <input id="nick" maxlength="8" placeholder="比如:小豆" autocomplete="off">
+            </label>
+            <button class="btn-big" id="drawBtn">抽卡领养</button>
+            <details class="more odds-more">
+              <summary>四档稀有度和奖品</summary>
+              <ul class="odds" id="odds"></ul>
+            </details>
+          </div>
+
+          <div id="mine" hidden>
+            <p class="tier-line"><span class="tier-tag" id="tierTag">N</span> <b id="tierName">普通</b> · 我的拼豆伙伴</p>
+            <h1 id="petName">—</h1>
+            <p class="dream" id="dream">—</p>
+            <div class="powers" id="powers"></div>
+            <div class="prize">
+              <span>现在能领的奖品</span>
+              <b id="prizeText">—</b>
+              <small id="prizeWhy"></small>
+            </div>
+            <a class="btn-big" id="nextBtn" href="pixel.html">—</a>
+            <a class="btn-claim" id="claimBtn" href="index.html#join" data-signup target="_blank" rel="noopener">领奖并报名 →</a>
+            <div class="code-row">
+              <span>领奖码</span>
+              <code id="codeText">—</code>
+              <button class="btn-copy" id="copyBtn" type="button">复制</button>
+            </div>
+            <p class="fine-l">报名表里有一栏「伙伴卡号」,把领奖码粘贴进去。点「领奖并报名」也会自动复制。</p>
+            <button class="btn-share" id="shareBtn" type="button">分享我的伙伴卡(带二维码)</button>
+          </div>
+        </div>
+      </section>
+
+      <section class="train">
+        <h2>带它去训练</h2>
+        <p class="lead">每关几分钟,做完右边的小任务就算过关,伙伴会学会一个新技能。</p>
+      <div class="levels">
+        <a class="level" href="pixel.html" data-level="pixel">
+          <div class="level-pic" aria-hidden="true">
+            <svg viewBox="0 0 320 200">
+              <rect width="320" height="200" fill="#16181D"/>
+              <g id="hubHeart"></g>
+            </svg>
+          </div>
+          <div class="level-body">
+            <div class="stars">★<span>★★</span></div>
+            <b>第 1 关 · 拼豆像素画</b>
+            <span class="level-skill">解锁 🧩 拼出身体</span>
+            <p>照着淡淡的图案,一颗颗把你的伙伴拼出来。学会:点一下放、选颜色、撤销。</p>
+            <span class="level-go">开始 →</span>
+          </div>
+        </a>
+
+        <a class="level" href="lamp.html" data-level="lamp">
+          <div class="level-pic" aria-hidden="true">
+            <svg viewBox="0 0 320 200">
+              <defs><radialGradient id="hg" cx="50%" cy="50%" r="55%"><stop offset="0" stop-color="#FFB65C" stop-opacity=".55"/><stop offset="1" stop-color="#FFB65C" stop-opacity="0"/></radialGradient></defs>
+              <rect width="320" height="200" fill="#07080A"/>
+              <circle cx="160" cy="100" r="110" fill="url(#hg)"/>
+              <rect x="110" y="40" width="100" height="110" rx="4" fill="#2C2740"/>
+              <g fill="#FFD27A"><circle cx="130" cy="62" r="5"/><circle cx="182" cy="78" r="5"/><circle cx="150" cy="104" r="5"/><circle cx="194" cy="122" r="5"/><circle cx="126" cy="132" r="5"/></g>
+              <rect x="104" y="150" width="112" height="10" rx="3" fill="#2A2D34"/>
+            </svg>
+          </div>
+          <div class="level-body">
+            <div class="stars">★★<span>★</span></div>
+            <b>第 2 关 · 发光拼豆灯罩</b>
+            <span class="level-skill">解锁 💡 发光</span>
+            <p>把伙伴拼到灯罩上,开灯让它发光,再切到 3D 转一圈。新学:开灯、切换视角。</p>
+            <span class="level-go">开始 →</span>
+          </div>
+        </a>
+
+        <a class="level" href="puppet.html" data-level="puppet">
+          <div class="level-pic" aria-hidden="true">
+            <svg viewBox="0 0 320 200">
+              <rect width="320" height="200" fill="#16181D"/>
+              <g id="hubPuppet"></g>
+            </svg>
+          </div>
+          <div class="level-body">
+            <div class="stars">★★★</div>
+            <b>第 3 关 · 会动的豆条小人</b>
+            <span class="level-skill">解锁 🦾 可动</span>
+            <p>给伙伴装上豆条手臂,豆子上的孔就是关节。拖动摆姿势,再让它挥手。新学:拖动零件。</p>
+            <span class="level-go">开始 →</span>
+          </div>
+        </a>
+
+        <a class="level" href="build.html" data-level="build">
+          <div class="level-pic" aria-hidden="true">
+            <svg viewBox="0 0 320 200">
+              <rect width="320" height="200" fill="#16181D"/>
+              <path d="M60 160 L160 190 L260 160 L160 130 Z" fill="#3B4642"/>
+              <g fill="#3FBFAE"><rect x="104" y="70" width="10" height="80" rx="5"/><rect x="206" y="70" width="10" height="80" rx="5"/><rect x="155" y="88" width="10" height="82" rx="5"/></g>
+              <path d="M96 70 L224 70 L224 80 L96 80 Z" fill="#E8935A"/>
+              <g fill="#16181D" opacity=".45"><circle cx="109" cy="75" r="3"/><circle cx="135" cy="75" r="3"/><circle cx="160" cy="75" r="3"/><circle cx="185" cy="75" r="3"/><circle cx="211" cy="75" r="3"/></g>
+              <rect x="206" y="52" width="70" height="10" rx="5" fill="#9A90EA" transform="rotate(-18 211 57)"/>
+              <g><circle cx="70" cy="150" r="7" fill="#E5484D"/><circle cx="70" cy="136" r="7" fill="#F5D547"/><circle cx="70" cy="122" r="7" fill="#3E63DD"/><circle cx="70" cy="108" r="7" fill="#3DB86B"/></g>
+            </svg>
+          </div>
+          <div class="level-body">
+            <div class="stars">★★<span>★</span></div>
+            <b>第 4 关 · 立体搭建</b>
+            <span class="level-skill">解锁 🧱 搭骨架</span>
+            <p>跟着发光的位置,给伙伴搭一副能站、能转的骨架,最后它自己站上去。新学:换零件。</p>
+            <span class="level-go">开始 →</span>
+          </div>
+        </a>
+      </div>
+
+      </section>
+
+      <details class="more rules">
+        <summary>活动说明</summary>
+        <ul id="rules"></ul>
+      </details>
+    </div>
+  </main>
+  <div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+  <script>
+    const NS = "http://www.w3.org/2000/svg";
+    function bead(g, x, y, r, fill) {
+      const c = document.createElementNS(NS, "circle");
+      c.setAttribute("cx", x);
+      c.setAttribute("cy", y);
+      c.setAttribute("r", r);
+      c.setAttribute("fill", fill);
+      g.appendChild(c);
+      const h = document.createElementNS(NS, "circle");
+      h.setAttribute("cx", x);
+      h.setAttribute("cy", y);
+      h.setAttribute("r", r * 0.38);
+      h.setAttribute("fill", "rgba(0,0,0,.25)");
+      g.appendChild(h);
+    }
+    const HEART = ["..XX.XX..", ".XRRXRRX.", "XRRRRRRRX", "XRRRRRRRX", ".XRRRRRX.", "..XRRRX..", "...XRX...", "....X...."];
+    const hh = document.getElementById("hubHeart");
+    HEART.forEach((row, j) => [...row].forEach((ch, i) => {
+      if (ch !== ".") bead(hh, 96 + i * 16, 40 + j * 16, 7, ch === "X" ? "#F6E7DA" : "#E5484D");
+    }));
+    const hp = document.getElementById("hubPuppet");
+    function strip(x0, y0, ang, n, col) {
+      const a = ang * Math.PI / 180;
+      for (let k = 0; k < n; k++) bead(hp, x0 + Math.cos(a) * k * 13, y0 + Math.sin(a) * k * 13, 6, col);
+    }
+    strip(140, 92, 125, 4, "#E5484D");
+    strip(170, 92, 55, 4, "#E5484D");
+    strip(155, 92, 105, 5, "#1F8FA6");
+    strip(155, 92, 75, 5, "#1F8FA6");
+    for (let j = 0; j < 4; j++) for (let i = 0; i < 4; i++) if (!((i === 0 || i === 3) && (j === 0 || j === 3))) bead(hp, 136 + i * 13, 20 + j * 13, 6, "#F5D547");
+    strip(155, 68, 90, 3, "#F28B2E");
+    strip(155, 72, 200, 4, "#3DB86B");
+    strip(155, 72, -20, 4, "#3DB86B");
+  </script>
+</body>
+</html>
